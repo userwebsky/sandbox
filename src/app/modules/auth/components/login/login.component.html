@@ -1,0 +1,36 @@
+<div class="login-wrapper mt-3">
+  <h2>Zaloguj się:</h2>
+  <form #f="ngForm" (ngSubmit)="onLogin()">
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Nazwa użytkownika</mat-label>
+        <input matInput required name="username" [(ngModel)]="userData.username" minlength="3">
+      </mat-form-field>
+    </div>
+    <ng-container *ngIf="f.controls?.['username']?.invalid && f.controls?.['username']?.touched
+&& f.controls?.['username']?.dirty">
+      <app-alert *ngIf="f.controls?.['username']?.errors" [text]="'Musi mieć min. 3 znaki'"></app-alert>
+    </ng-container>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Hasło</mat-label>
+        <input matInput [type]="hide ? 'password' : 'text'" required name="password" [(ngModel)]="userData.password">
+        <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide">
+          <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+    <ng-container *ngIf="f.controls?.['password']?.invalid || (f.controls?.['password']?.touched
+&& f.controls?.['password']?.dirty)">
+      <app-alert *ngIf="f.controls?.['password']?.errors" [text]="'Pole nie moze być puste'"></app-alert>
+    </ng-container>
+    <div class="d-flex justify-content-end">
+      <button mat-raised-button color="primary" type="submit" [disabled]="!!f.invalid">Zaloguj się</button>
+    </div>
+    <div>
+      <p class="text-center">Nie masz konta? <a routerLink="/rejestracja">Utwórz</a></p>
+    </div>
+    <app-alert *ngIf="errorMessage" [text]="errorMessage"></app-alert>
+  </form>
+</div>

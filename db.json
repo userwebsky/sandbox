@@ -1,0 +1,21 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@abc.pl",
+      "password": "pass",
+      "username": "admin"
+    }
+  ],
+  "clients": [
+    {
+      "id": "1",
+      "firstname": "Adam",
+      "surname": "Testowy",
+      "email": "a.testowy@abc.pl",
+      "phone": "123456789",
+      "address": "Miasto Noew",
+      "postCode": "01-123"
+    }
+  ]
+}

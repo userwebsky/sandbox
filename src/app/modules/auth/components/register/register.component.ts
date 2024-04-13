@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from "../../../core/services/auth.service";
 import { Router } from "@angular/router";
+import { FormsService } from "../../../core/services/forms.service";
 
 @Component({
   selector: 'app-register',
@@ -12,7 +13,7 @@ export class RegisterComponent implements OnInit {
   hide = true;
   errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private formService: FormsService) {
   }
 
   registerForm: FormGroup = new FormGroup({
@@ -45,12 +46,6 @@ export class RegisterComponent implements OnInit {
   }
 
   getErrorMessage(control: AbstractControl<any>) {
-    if (control.hasError('email')) {
-      return "Niepoprawny email!";
-    } else if (control.hasError('required')) {
-      return "To pole jest wymagane!";
-    } else {
-      return "Formularz zawiera błędy!";
-    }
+    return this.formService.getErrorMessage(control);
   }
 }

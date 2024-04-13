@@ -1,0 +1,51 @@
+<div class="client-form-wrapper mt-3">
+  <h2>Dodaj klienta:</h2>
+  <form [formGroup]="clientForm" (ngSubmit)="onAddClient()">
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Imię</mat-label>
+        <input matInput formControlName="firstname">
+        <mat-error *ngIf="controls['firstname'].invalid">{{ getErrorMessage(controls['firstname']) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Nazwisko</mat-label>
+        <input matInput formControlName="surname">
+        <mat-error *ngIf="controls['surname'].invalid">{{ getErrorMessage(controls['surname']) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Adres e-mail</mat-label>
+        <input matInput placeholder="test@gmail.com" formControlName="email">
+        <mat-error *ngIf="controls['email'].invalid">{{ getErrorMessage(controls['email']) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Telefon</mat-label>
+        <input matInput formControlName="phone">
+        <mat-error *ngIf="controls['phone'].invalid">{{ getErrorMessage(controls['phone']) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Adres</mat-label>
+        <input matInput formControlName="address">
+        <mat-error *ngIf="controls['address'].invalid">{{ getErrorMessage(controls['address']) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Kod pocztowy</mat-label>
+        <input matInput formControlName="postcode">
+        <mat-error *ngIf="controls['postcode'].invalid">{{ getErrorMessage(controls['postcode']) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button color="primary" mat-raised-button type="submit" [disabled]="clientForm.invalid">Dodaj</button>
+    </div>
+  </form>
+  <app-alert *ngIf="errorMessage" [text]="errorMessage"></app-alert>
+</div>

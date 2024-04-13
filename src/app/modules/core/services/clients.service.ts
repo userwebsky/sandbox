@@ -86,4 +86,8 @@ export class ClientsService {
            }) => new Client(address, email, firstname, id, phone, postcode, surname))
     )
   }
+
+  deleteClient(id: number): Observable<Record<string, never>> {
+    return this.http.delete<Record<string, never>>(`${this.apiUrl}/clients/${id}`);
+  }
 }

@@ -18,15 +18,6 @@
       "postCode": "01-123"
     },
     {
-      "id": "2",
-      "firstname": "Barbara",
-      "surname": "Kowalska",
-      "email": "b.kowalska@abc.pl",
-      "phone": "987654321",
-      "address": "Miasto Stare",
-      "postCode": "02-234"
-    },
-    {
       "id": "3",
       "firstname": "Cezary",
       "surname": "Nowak",
@@ -34,6 +25,15 @@
       "phone": "123123123",
       "address": "Miasto Wschodnie",
       "postCode": "03-345"
+    },
+    {
+      "firstname": "Jacek",
+      "surname": "Daniels",
+      "email": "j.daniels@whisky.pl",
+      "phone": "1234567",
+      "address": "Wawa",
+      "postcode": "01-427",
+      "id": "Ta22UlZ"
     }
   ]
 }

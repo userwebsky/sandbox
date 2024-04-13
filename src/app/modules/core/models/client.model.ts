@@ -1,3 +1,5 @@
+import { FormControl } from "@angular/forms";
+
 export interface ClientResponse {
   id: number;
   firstname: string;
@@ -34,3 +36,6 @@ export interface GetClientsResponse {
   clients: Client[];
   totalCount: number;
 }
+
+export interface PostClientForm {firstname: FormControl<string>, address: FormControl<string>, phone: FormControl<string>,
+  surname: FormControl<string>, postcode: FormControl<string>, email: FormControl<string>}

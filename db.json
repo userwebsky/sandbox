@@ -16,6 +16,24 @@
       "phone": "123456789",
       "address": "Miasto Noew",
       "postCode": "01-123"
+    },
+    {
+      "id": "2",
+      "firstname": "Barbara",
+      "surname": "Kowalska",
+      "email": "b.kowalska@abc.pl",
+      "phone": "987654321",
+      "address": "Miasto Stare",
+      "postCode": "02-234"
+    },
+    {
+      "id": "3",
+      "firstname": "Cezary",
+      "surname": "Nowak",
+      "email": "c.nowak@abc.pl",
+      "phone": "123123123",
+      "address": "Miasto Wschodnie",
+      "postCode": "03-345"
     }
   ]
 }

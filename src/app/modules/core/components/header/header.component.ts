@@ -1,7 +1,7 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AuthService} from "../../services/auth.service";
-import {User} from "../../models/user.model";
-import {Subscription} from "rxjs";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AuthService } from "../../services/auth.service";
+import { User } from "../../models/user.model";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'app-header',

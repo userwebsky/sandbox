@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {environment} from "../../../../environments/environment";
-import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, map, Observable, tap} from "rxjs";
-import {GetUsersResponse, User, UserLoginData} from "../models/user.model";
-import {Router} from "@angular/router";
+import { Injectable } from '@angular/core';
+import { environment } from "../../../../environments/environment";
+import { HttpClient } from "@angular/common/http";
+import { BehaviorSubject, map, Observable, tap } from "rxjs";
+import { GetUsersResponse, PostUser, PostUserResponse, User, UserLoginData } from "../models/user.model";
+import { Router } from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,8 @@ export class AuthService {
   apiUrl = environment.apiUrl;
   user = new BehaviorSubject<User | null>(null);
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) {
+  }
 
   login(userData: UserLoginData): Observable<User[]> {
     return this.http.get<GetUsersResponse[]>(`${this.apiUrl}/users`).pipe(
@@ -48,6 +49,10 @@ export class AuthService {
 
     const user = new User(userData.email, userData.username);
     this.user.next(user);
+  }
+
+  register(userData: PostUser): Observable<PostUserResponse> {
+    return this.http.post<PostUserResponse>(`${this.apiUrl}/users`, userData);
   }
 
   private handleAuthentication(userArr: User[]) {

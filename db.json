@@ -4,7 +4,7 @@
       "id": "1",
       "email": "admin@abc.pl",
       "password": "pass",
-      "username": "admin"
+      "username": "user"
     }
   ],
   "clients": [
@@ -18,13 +18,13 @@
       "postCode": "01-123"
     },
     {
-      "id": "3",
       "firstname": "Cezary",
       "surname": "Nowak",
       "email": "c.nowak@abc.pl",
       "phone": "123123123",
       "address": "Miasto Wschodnie",
-      "postCode": "03-345"
+      "postcode": "11-123",
+      "id": "3"
     },
     {
       "firstname": "Jacek",
@@ -33,7 +33,16 @@
       "phone": "1234567",
       "address": "Wawa",
       "postcode": "01-427",
-      "id": "Ta22UlZ"
+      "id": "4"
+    },
+    {
+      "firstname": "Piotr",
+      "surname": "Testowy",
+      "email": "p.test@test.pp",
+      "phone": "123456281",
+      "address": "Olsztyn",
+      "postcode": "11-222",
+      "id": "5"
     }
   ]
 }

@@ -8,6 +8,7 @@ import { SharedModule } from "../shared/shared.module";
 import { ClientComponent } from './components/client/client.component';
 import { ClientFormComponent } from './components/client-form/client-form.component';
 import { DeleteClientDialogComponent } from './components/client/delete-client-dialog/delete-client-dialog.component';
+import { EditClientDialogComponent } from './components/client/edit-client-dialog/edit-client-dialog.component';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { DeleteClientDialogComponent } from './components/client/delete-client-d
     ClientsTableComponent,
     ClientComponent,
     ClientFormComponent,
-    DeleteClientDialogComponent
+    DeleteClientDialogComponent,
+    EditClientDialogComponent
   ],
     imports: [
         CommonModule,

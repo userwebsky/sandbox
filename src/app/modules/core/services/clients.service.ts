@@ -90,4 +90,18 @@ export class ClientsService {
   deleteClient(id: number): Observable<Record<string, never>> {
     return this.http.delete<Record<string, never>>(`${this.apiUrl}/clients/${id}`);
   }
+
+  putClient(clientData: PostClient, id: number): Observable<Client> {
+    return this.http.put<ClientResponse>(`${this.apiUrl}/clients/${id}`, clientData).pipe(
+      map(({
+             address,
+             email,
+             firstname,
+             id,
+             phone,
+             postcode,
+             surname
+           }) => new Client(address, email, firstname, id, phone, postcode, surname))
+    )
+  }
 }

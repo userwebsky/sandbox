@@ -13,6 +13,8 @@ export class FormsService {
       return "Niepoprawny email!";
     } else if (control.hasError('required')) {
       return "To pole jest wymagane!";
+    } else if (control.hasError('invalidPostcode')) {
+      return "Błędny kod pocztowy!";
     } else {
       return "Formularz zawiera błędy!";
     }

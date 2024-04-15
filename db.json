@@ -9,13 +9,13 @@
   ],
   "clients": [
     {
-      "id": "1",
       "firstname": "Adam",
       "surname": "Testowy",
       "email": "a.testowy@abc.pl",
       "phone": "123456789",
       "address": "Miasto Noew",
-      "postCode": "01-123"
+      "postcode": "11-111",
+      "id": "1"
     },
     {
       "firstname": "Cezary",

@@ -22,13 +22,14 @@
         <mat-error *ngIf="controls['email'].invalid">{{ getErrorMessage(controls['email']) }}</mat-error>
       </mat-form-field>
     </div>
-    <div>
+    <!--<div>
       <mat-form-field appearance="fill">
         <mat-label>Telefon</mat-label>
         <input matInput formControlName="phone">
         <mat-error *ngIf="controls['phone'].invalid">{{ getErrorMessage(controls['phone']) }}</mat-error>
       </mat-form-field>
-    </div>
+    </div>-->
+    <app-phone-control formControlName="phone"></app-phone-control>
     <div>
       <mat-form-field appearance="fill">
         <mat-label>Adres</mat-label>

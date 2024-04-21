@@ -6,13 +6,13 @@ import { ClientFormComponent } from "./components/client-form/client-form.compon
 
 const routes: Routes = [
   {
-    path: 'klienci', component: ClientsComponent
+    path: '', component: ClientsComponent
   },
   {
-    path: 'klienci/dodaj', component: ClientFormComponent
+    path: 'dodaj', component: ClientFormComponent
   },
   {
-    path: 'klienci/:id',
+    path: ':id',
     component: ClientComponent
   }
 ];

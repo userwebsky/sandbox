@@ -26,7 +26,6 @@ import { EditClientDialogComponent } from './components/client/edit-client-dialo
         SharedModule
     ],
   exports: [
-    ClientsComponent
   ]
 })
 export class ClientsModule {

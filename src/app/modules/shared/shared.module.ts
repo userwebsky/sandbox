@@ -4,12 +4,14 @@ import { MaterialModule } from "./material/material.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AlertComponent } from './components/alert/alert.component';
 import { PhoneControlComponent } from './controls/phone-control/phone-control.component';
+import { HighlightDirective } from './directives/highlight.directive';
 
 
 @NgModule({
   declarations: [
     AlertComponent,
-    PhoneControlComponent
+    PhoneControlComponent,
+    HighlightDirective
   ],
   imports: [
     CommonModule,
@@ -22,7 +24,8 @@ import { PhoneControlComponent } from './controls/phone-control/phone-control.co
     FormsModule,
     ReactiveFormsModule,
     AlertComponent,
-    PhoneControlComponent
+    PhoneControlComponent,
+    HighlightDirective
   ]
 })
 export class SharedModule {

@@ -4,6 +4,7 @@ import { ClientsComponent } from "./clients.component";
 import { ClientComponent } from "./components/client/client.component";
 import { ClientFormComponent } from "./components/client-form/client-form.component";
 import { clientFormDeactivateGuard } from "../core/guards/client-form-deactivate.guard";
+import { ClientResolver } from "../core/resolvers/client.resolver";
 //import { AuthActivateGuard } from "../core/guards/auth-activate.guard";
 ///import { authGuardActivate } from "../core/guards/auth-activate.function.guard";
 
@@ -13,6 +14,7 @@ const routes: Routes = [
     //canActivate: [AuthActivateGuard] użycie klasy
     //canActivate:[authGuardActivate] //użycie funkcji
     //obecnie działa guard load w app module
+    //resolve: {client: ClientResolver } przykład resolver
   },
   {
     path: 'dodaj', component: ClientFormComponent, canDeactivate: [clientFormDeactivateGuard]

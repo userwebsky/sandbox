@@ -6,18 +6,20 @@ import { AppComponent } from './app.component';
 import { CoreModule } from './modules/core/core.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthModule } from './modules/auth/auth.module';
+import { FooterComponent } from "./modules/core/components/footer/footer.component";
 
 @NgModule({
   declarations: [
     AppComponent
   ],
-  imports: [
-    BrowserModule,
-    CoreModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    AuthModule,
-  ],
+    imports: [
+        BrowserModule,
+        CoreModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        AuthModule,
+        FooterComponent,
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

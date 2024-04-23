@@ -1,9 +1,4 @@
-import {
-  CanLoadFn,
-  Route,
-  Router,
-  UrlSegment
-} from "@angular/router";
+import { CanLoadFn, Route, Router, UrlSegment } from "@angular/router";
 import { inject } from "@angular/core";
 import { AuthService } from "../services/auth.service";
 

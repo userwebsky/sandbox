@@ -20,13 +20,12 @@ import { EditClientDialogComponent } from './components/client/edit-client-dialo
     DeleteClientDialogComponent,
     EditClientDialogComponent
   ],
-    imports: [
-        CommonModule,
-        ClientsRoutingModule,
-        SharedModule
-    ],
-  exports: [
-  ]
+  imports: [
+    CommonModule,
+    ClientsRoutingModule,
+    SharedModule
+  ],
+  exports: []
 })
 export class ClientsModule {
 }

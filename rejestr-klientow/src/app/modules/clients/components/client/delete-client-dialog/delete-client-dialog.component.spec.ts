@@ -8,9 +8,9 @@ describe('DeleteClientDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DeleteClientDialogComponent ]
+      declarations: [DeleteClientDialogComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeleteClientDialogComponent);
     component = fixture.componentInstance;

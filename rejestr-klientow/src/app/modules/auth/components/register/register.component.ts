@@ -12,15 +12,14 @@ import { FormsService } from "../../../core/services/forms.service";
 export class RegisterComponent implements OnInit {
   hide = true;
   errorMessage = '';
-
-  constructor(private authService: AuthService, private router: Router, private formService: FormsService) {
-  }
-
   registerForm: FormGroup = new FormGroup({
     email: new FormControl('', {validators: [Validators.email], nonNullable: true}),
     username: new FormControl('', {validators: [Validators.required], nonNullable: true}),
     password: new FormControl('', {validators: [Validators.required], nonNullable: true}),
   });
+
+  constructor(private authService: AuthService, private router: Router, private formService: FormsService) {
+  }
 
   get controls() {
     return this.registerForm.controls;

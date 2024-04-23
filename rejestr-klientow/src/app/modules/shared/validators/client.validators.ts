@@ -9,6 +9,6 @@ export class ClientValidators {
       return null;
     }
 
-    return { invalidPostcode: { value } }; //invalid
+    return {invalidPostcode: {value}}; //invalid
   }
 }

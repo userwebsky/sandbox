@@ -8,9 +8,9 @@ describe('EditClientDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditClientDialogComponent ]
+      declarations: [EditClientDialogComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(EditClientDialogComponent);
     component = fixture.componentInstance;

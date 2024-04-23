@@ -6,7 +6,8 @@ import { AbstractControl } from "@angular/forms";
 })
 export class FormsService {
 
-  constructor() { }
+  constructor() {
+  }
 
   getErrorMessage(control: AbstractControl<any>) {
     if (control.hasError('email')) {

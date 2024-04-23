@@ -1,13 +1,13 @@
 <div *ngIf="client">
   <pre>
-    {{client | json}}
+    {{ client | json }}
   </pre>
   <div>
     <p>Edytuj klienta</p>
-    <button mat-raised-button color="primary" (click)="openEditDialog()">Edytuj</button>
+    <button (click)="openEditDialog()" color="primary" mat-raised-button>Edytuj</button>
   </div>
   <div>
     <p>Usuń klienta</p>
-    <button mat-raised-button color="warn" (click)="openDialog()">Usuń</button>
+    <button (click)="openDialog()" color="warn" mat-raised-button>Usuń</button>
   </div>
 </div>

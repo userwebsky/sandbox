@@ -6,7 +6,7 @@ describe('HeaderClassInterceptor', () => {
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
       HeaderClassInterceptor
-      ]
+    ]
   }));
 
   it('should be created', () => {

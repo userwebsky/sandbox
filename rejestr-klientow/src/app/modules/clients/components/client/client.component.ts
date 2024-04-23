@@ -20,7 +20,8 @@ export class ClientComponent implements OnInit {
     private clientService: ClientsService,
     private route: ActivatedRoute,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.route.params.pipe(
@@ -33,17 +34,20 @@ export class ClientComponent implements OnInit {
   }
 
   openDialog() {
-    const dialogRef = this.dialog.open(DeleteClientDialogComponent, {data: {
-      client: this.client
-      }});
+    const dialogRef = this.dialog.open(DeleteClientDialogComponent, {
+      data: {
+        client: this.client
+      }
+    });
   }
 
   openEditDialog() {
-    const dialogRef = this.dialog.open(EditClientDialogComponent, {data: {
+    const dialogRef = this.dialog.open(EditClientDialogComponent, {
+      data: {
         client: this.client
       },
-    width: '600px',
-    maxWidth: '600px',
+      width: '600px',
+      maxWidth: '600px',
 
     });
   }

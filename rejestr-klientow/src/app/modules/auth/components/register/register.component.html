@@ -1,24 +1,24 @@
 <div class="register-wrapper mt-3">
   <h2>Zarejestruj się:</h2>
-  <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+  <form (ngSubmit)="onRegister()" [formGroup]="registerForm">
     <div>
       <mat-form-field appearance="fill">
         <mat-label>Adres e-mail</mat-label>
-        <input matInput placeholder="test@gmail.com" formControlName="email">
+        <input formControlName="email" matInput placeholder="test@gmail.com">
         <mat-error *ngIf="controls['email'].invalid">{{ getErrorMessage(controls['email']) }}</mat-error>
       </mat-form-field>
     </div>
     <div>
       <mat-form-field appearance="fill">
         <mat-label>Nazwa użytkownika</mat-label>
-        <input matInput formControlName="username">
+        <input formControlName="username" matInput>
         <mat-error *ngIf="controls['username'].invalid">{{ getErrorMessage(controls['username']) }}</mat-error>
       </mat-form-field>
     </div>
     <div>
       <mat-form-field appearance="fill">
         <mat-label>Hasło</mat-label>
-        <input [type]="hide ? 'password' : 'text'" matInput formControlName="password">
+        <input [type]="hide ? 'password' : 'text'" formControlName="password" matInput>
         <mat-error *ngIf="controls['password'].invalid">{{ getErrorMessage(controls['password']) }}</mat-error>
         <button (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" mat-icon-button
                 matSuffix>
@@ -27,7 +27,7 @@
       </mat-form-field>
     </div>
     <div class="d-flex justify-content-end">
-      <button color="primary" mat-raised-button type="submit" [disabled]="registerForm.invalid">Zarejestruj się</button>
+      <button [disabled]="registerForm.invalid" color="primary" mat-raised-button type="submit">Zarejestruj się</button>
     </div>
   </form>
   <app-alert *ngIf="errorMessage" [text]="errorMessage"></app-alert>

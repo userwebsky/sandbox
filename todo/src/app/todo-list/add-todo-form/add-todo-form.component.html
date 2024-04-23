@@ -1,0 +1,24 @@
+<form #form='ngForm' (ngSubmit)="addNewTodo()">
+  <p class="mt-4">Dodaj nowe zadanie:</p>
+  <input #todo='ngModel' [(ngModel)]="todoName" appFirstLetter class="form-control" maxlength="50" minlength="4" name="todo"
+         required type="text">
+  <ng-container *ngIf="todo.invalid && (todo.touched || todo.dirty)">
+    <app-alert *ngIf="todo.control.errors?.['required']"
+               [errorMessage]="'Ta kontrolka nie może być pusta.'"></app-alert>
+    <app-alert *ngIf="todo.control.errors?.['minlength'] && !todo.control.errors?.['firstLetter']"
+               [errorMessage]="'Ta kontrolka może mieć minimum 4 znaki.'"></app-alert>
+    <app-alert *ngIf="todo.control.errors?.['maxlength']"
+               [errorMessage]="'Ta kontrolka może mieć maksimum 50 znaków.'"></app-alert>
+    <app-alert *ngIf="todo.control.errors?.['firstLetter']"
+               [errorMessage]="'Pierwszy znak musi być literą.'"></app-alert>
+  </ng-container>
+
+  <!--  <div ngModelGroup="person" #group='ngModelGroup'>-->
+  <!--    <input type="text" [(ngModel)]="person.name" name="name" required>-->
+  <!--    <input type="text" [(ngModel)]="person.surname" name="surname" required>-->
+  <!--    <input type="text" [(ngModel)]="person.role" name="role" required>-->
+  <!--  </div>-->
+
+  <button [disabled]="!form.valid" class="btn btn-primary mt-3" type="submit">Dodaj zadanie</button>
+</form>
+

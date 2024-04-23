@@ -6,7 +6,7 @@ describe('SpinnerInterceptor', () => {
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
       SpinnerInterceptor
-      ]
+    ]
   }));
 
   it('should be created', () => {

@@ -8,9 +8,9 @@ describe('PhoneControlComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PhoneControlComponent ]
+      declarations: [PhoneControlComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(PhoneControlComponent);
     component = fixture.componentInstance;

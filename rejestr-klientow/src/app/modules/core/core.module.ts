@@ -20,8 +20,8 @@ import { HeaderClassInterceptor } from "./iterceptors/header.class.interceptor";
     HttpClientModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: SpinnerInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: HeaderClassInterceptor, multi: true }
+    {provide: HTTP_INTERCEPTORS, useClass: SpinnerInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: HeaderClassInterceptor, multi: true}
   ],
   exports: [
     HeaderComponent,

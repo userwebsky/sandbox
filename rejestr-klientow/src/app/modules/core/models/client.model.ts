@@ -37,5 +37,11 @@ export interface GetClientsResponse {
   totalCount: number;
 }
 
-export interface PostClientForm {firstname: FormControl<string>, address: FormControl<string>, phone: FormControl<string>,
-  surname: FormControl<string>, postcode: FormControl<string>, email: FormControl<string>}
+export interface PostClientForm {
+  firstname: FormControl<string>,
+  address: FormControl<string>,
+  phone: FormControl<string>,
+  surname: FormControl<string>,
+  postcode: FormControl<string>,
+  email: FormControl<string>
+}

@@ -13,8 +13,7 @@ import { SharedModule } from "../shared/shared.module";
     HomeRoutingModule,
     SharedModule
   ],
-  exports: [
-  ]
+  exports: []
 })
 export class HomeModule {
 }

@@ -17,7 +17,8 @@ export class DeleteClientDialogComponent implements OnInit {
   constructor(private dialogRef: MatDialogRef<DeleteClientDialogComponent>,
               @Inject(MAT_DIALOG_DATA) private data: { client: Client },
               private router: Router,
-              private clientsService: ClientsService) {}
+              private clientsService: ClientsService) {
+  }
 
   ngOnInit(): void {
     this.client = this.data.client;

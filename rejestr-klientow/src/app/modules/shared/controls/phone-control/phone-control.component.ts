@@ -1,7 +1,6 @@
-import { Component, forwardRef, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators } from "@angular/forms";
 import { combineLatest, Subscription } from "rxjs";
-import { FormsService } from "../../../core/services/forms.service";
 
 @Component({
   selector: 'app-phone-control',
@@ -33,8 +32,10 @@ export class PhoneControlComponent implements ControlValueAccessor, OnDestroy {
     }));
   }
 
-  onChange = (value: string | null) => {};
-  onTouch = () => {};
+  onChange = (value: string | null) => {
+  };
+  onTouch = () => {
+  };
 
   registerOnChange(fn: () => void): void {
     this.onChange = fn;

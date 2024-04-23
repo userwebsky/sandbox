@@ -12,14 +12,14 @@ import { FooterComponent } from "./modules/core/components/footer/footer.compone
   declarations: [
     AppComponent
   ],
-    imports: [
-        BrowserModule,
-        CoreModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        AuthModule,
-        FooterComponent,
-    ],
+  imports: [
+    BrowserModule,
+    CoreModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    AuthModule,
+    FooterComponent,
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

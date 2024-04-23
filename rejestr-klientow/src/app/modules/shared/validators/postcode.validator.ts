@@ -1,7 +1,7 @@
 import { AbstractControl, ValidatorFn } from "@angular/forms";
 
 export function postcodeValidator(): ValidatorFn {
-  return (control: AbstractControl): { [key: string]: {value: string} } | null => {
+  return (control: AbstractControl): { [key: string]: { value: string } } | null => {
     const postcodePattern = /^\d{2}-\d{3}$/;
     const value = control.value;
 
@@ -9,6 +9,6 @@ export function postcodeValidator(): ValidatorFn {
       return null;
     }
 
-    return { invalidPostcode: { value } }; //invalid
+    return {invalidPostcode: {value}}; //invalid
   }
 }

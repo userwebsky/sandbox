@@ -20,7 +20,7 @@ export class ClientsTableComponent implements AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   totalCount = 0;
-  filterValue = new FormControl('', { nonNullable: true })
+  filterValue = new FormControl('', {nonNullable: true})
   sub = new Subscription();
 
   constructor(private clientsService: ClientsService) {
@@ -56,9 +56,9 @@ export class ClientsTableComponent implements AfterViewInit, OnDestroy {
     this.sub.add(this.filterValue.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe((value) => {
-      const val = value?.trim();
-      this.applyFilter(val);
-    }));
+        const val = value?.trim();
+        this.applyFilter(val);
+      }));
   }
 
   applyFilter(val: string) {

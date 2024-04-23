@@ -38,23 +38,23 @@ export class ClientsService {
       params
     }).pipe(
       map((response) => {
-        if (!response.body) return { clients: [], totalCount: 0 };
+        if (!response.body) return {clients: [], totalCount: 0};
 
         const clientsArr: Client[] = response.body.map(
           ({
-            address,
-            email,
-            firstname,
-            id,
-            phone,
-            postcode,
-            surname
-          }) => new Client(address, email, firstname, id, phone, postcode, surname)
+             address,
+             email,
+             firstname,
+             id,
+             phone,
+             postcode,
+             surname
+           }) => new Client(address, email, firstname, id, phone, postcode, surname)
         );
 
         const totalCount = Number(response.headers.get('X-Total-Count'));
 
-        return { clients: clientsArr, totalCount }
+        return {clients: clientsArr, totalCount}
       })
     )
   }

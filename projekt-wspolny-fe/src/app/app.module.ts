@@ -5,17 +5,19 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
-import { HeaderComponent } from './modules/components/header/header.component';
 import { EffectsModule } from '@ngrx/effects';
+import { CoreModule } from "./modules/core/core.module";
+import { AuthModule } from "./modules/auth/auth.module";
 
 @NgModule({
   declarations: [
-    AppComponent,
-    HeaderComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    CoreModule,
+    AuthModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({}, {}),
     EffectsModule.forRoot([])

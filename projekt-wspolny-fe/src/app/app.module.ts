@@ -8,6 +8,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { CoreModule } from "./modules/core/core.module";
 import { AuthModule } from "./modules/auth/auth.module";
+import { authReducer } from "./modules/auth/store/auth.reducer";
 
 @NgModule({
   declarations: [
@@ -19,7 +20,7 @@ import { AuthModule } from "./modules/auth/auth.module";
     CoreModule,
     AuthModule,
     BrowserAnimationsModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot({ auth: authReducer }),
     EffectsModule.forRoot([])
   ],
   providers: [],

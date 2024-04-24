@@ -1,4 +1,4 @@
-<form [formGroup]="registerForm" >
+<form [formGroup]="registerForm" (ngSubmit)="onRegister()" >
   <div class="form-input">
     <mat-form-field appearance="fill">
       <mat-label>Adres email</mat-label>
@@ -29,5 +29,9 @@
   </div>
   <div class="d-flex justify-content-end">
     <button mat-raised-button color="primary">Zarejestruj się</button>
+  </div>
+  <div class="alert alert-warning alert-dismissible fade show mt-2" role="alert">
+    {{ notMatchingPaswswordsError }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" *ngIf="notMatchingPaswswordsError" (click)="notMatchingPaswswordsError = null" ></button>
   </div>
 </form>

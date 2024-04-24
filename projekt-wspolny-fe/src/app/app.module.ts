@@ -10,6 +10,7 @@ import { CoreModule } from "./modules/core/core.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { authReducer } from "./modules/auth/store/auth.reducer";
 import { NotifierModule, NotifierOptions } from "angular-notifier";
+import { AuthEffects } from "./modules/auth/store/auth.effects";
 
 const customNotifier: NotifierOptions = {
   position: {
@@ -38,7 +39,7 @@ const customNotifier: NotifierOptions = {
     AuthModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({ auth: authReducer }),
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([AuthEffects]),
     NotifierModule.withConfig(customNotifier),
   ],
   providers: [],

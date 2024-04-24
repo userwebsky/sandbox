@@ -1,26 +1,30 @@
-<form>
+<form [formGroup]="registerForm" >
   <div class="form-input">
     <mat-form-field appearance="fill">
       <mat-label>Adres email</mat-label>
-      <input matInput type="email">
+      <input matInput type="email" [formControl]="controls.email">
+      <mat-error *ngIf="controls.email.invalid">{{ getErrorMessage(controls.email) }}</mat-error>
     </mat-form-field>
   </div>
   <div class="form-input">
     <mat-form-field appearance="fill">
       <mat-label>Login</mat-label>
-      <input matInput>
+      <input matInput [formControl]="controls.login">
+      <mat-error *ngIf="controls.login.invalid">{{ getErrorMessage(controls.login) }}</mat-error>
     </mat-form-field>
   </div>
   <div class="form-input">
     <mat-form-field appearance="fill">
       <mat-label>Hasło</mat-label>
-      <input type="password" matInput>
+      <input type="password" matInput [formControl]="controls.password">
+      <mat-error *ngIf="controls.password.invalid">{{ getErrorMessage(controls.password) }}</mat-error>
     </mat-form-field>
   </div>
   <div class="form-input">
     <mat-form-field appearance="fill">
       <mat-label>Powtórz hasło</mat-label>
-      <input type="password" matInput>
+      <input type="password" matInput [formControl]="controls.repeatedPassword">
+      <mat-error *ngIf="controls.repeatedPassword.invalid">{{ getErrorMessage(controls.repeatedPassword) }}</mat-error>
     </mat-form-field>
   </div>
   <div class="d-flex justify-content-end">

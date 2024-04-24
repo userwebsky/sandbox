@@ -11,3 +11,12 @@ export interface RegisterForm {
   repeatedPassword: FormControl<string>;
   email: FormControl<string>;
 }
+
+export interface RecoveryFrom {
+  email: FormControl<string>;
+}
+
+export interface ResetPasswordFrom {
+  password: FormControl<string>;
+  repeatedPassword: FormControl<string>;
+}

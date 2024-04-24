@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { LoginForm, RegisterForm } from "../models/forms.model";
+import { LoginForm, RecoveryFrom, RegisterForm, ResetPasswordFrom } from "../models/forms.model";
+import { equivalentValidator } from "../../shared/validators/equivalent.validator";
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,15 @@ export class FormService {
       }),
       password: new FormControl("", {
         validators: [Validators.required],
+        nonNullable: true,
+      })
+    });
+  }
+
+  initPasswdRecoveryForm(): FormGroup<RecoveryFrom> {
+    return new FormGroup({
+      email: new FormControl("", {
+        validators: [Validators.required, Validators.email],
         nonNullable: true,
       })
     });
@@ -40,13 +50,46 @@ export class FormService {
         validators: [Validators.required],
         nonNullable: true,
       }),
+    },
+      {
+        validators: [equivalentValidator("password", "repeatedPassword")]
+      });
+  }
+
+  initResetPasswordFrom(): FormGroup<ResetPasswordFrom> {
+    return new FormGroup({
+      password: new FormControl("", {
+        validators: [Validators.required],
+        nonNullable: true,
+      }),
+      repeatedPassword: new FormControl("", {
+        validators: [Validators.required],
+        nonNullable: true,
+      }),
     });
   }
 
   getErrorMessage(control: FormControl): string {
     if (control.hasError('required')) {
-      return "Pole wymagane!";
+      return 'Ta kontrolka jest wymagana.';
     }
-    return "";
+
+    if (control.hasError('minlength')) {
+      return `Minimalna ilość znaków: ${control.errors?.['minlength']?.requiredLength}.`;
+    }
+
+    if (control.hasError('maxlength')) {
+      return `Maksymalna ilość znaków: ${control.errors?.['maxlength']?.requiredLength}.`;
+    }
+
+    if (control.hasError('email')) {
+      return `Niepoprawny adres e-mail.`;
+    }
+
+    if (control.hasError('passwordsNotEqual')) {
+      return 'Hasła muszą być takie same.';
+    }
+
+    return '';
   }
 }

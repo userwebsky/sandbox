@@ -9,12 +9,16 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" >Home</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" routerLink="logowanie" routerLinkActive="active">Zaloguj sie</a>
-        </li>
-        <li class="nav-item">
-          <button mat-raised-button color="primary" (click)="logout()">Wyloguj się</button>
-        </li>
+        <ng-container *ngIf="user$ | async; else notUser">
+          <li class="nav-item">
+            <button mat-raised-button color="primary" (click)="logout()">Wyloguj się</button>
+          </li>
+        </ng-container>
+        <ng-template #notUser>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" routerLink="logowanie" routerLinkActive="active">Zaloguj sie</a>
+          </li>
+        </ng-template>
       </ul>
     </div>
   </div>

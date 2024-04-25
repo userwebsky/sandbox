@@ -21,11 +21,11 @@ export class AuthService {
   }
 
   login(body: LoginData): Observable<IUser> {
-    return this.http.post<IUser>(`${this.apiUrl}/login`, body);
+    return this.http.post<IUser>(`${this.apiUrl}/login`, body, { withCredentials: true });
   }
 
   logout(): Observable<AuthResponse> {
-    return this.http.get<AuthResponse>(`${this.apiUrl}/logout`);
+    return this.http.get<AuthResponse>(`${this.apiUrl}/logout`, { withCredentials: true });
   }
 
   register(body: RegisterData): Observable<AuthResponse> {

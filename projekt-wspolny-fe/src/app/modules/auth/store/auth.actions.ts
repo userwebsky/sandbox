@@ -5,6 +5,11 @@ const LOGIN_TYPE = '[Auth] Login';
 const LOGIN_SUCCESS_TYPE = '[Auth] Login Success';
 const LOGIN_FAILURE_TYPE = '[Auth] Login Failure';
 
+const LOGOUT_TYPE = '[Auth] Logout';
+const LOGOUT_SUCCESS_TYPE = '[Auth] Logout Success';
+const LOGOUT_FAILURE_TYPE = '[Auth] Logout Failure';
+
+
 const REGISTER_TYPE = '[Auth] Register';
 const REGISTER_SUCCESS_TYPE = '[Auth] Register Success';
 const REGISTER_FAILURE_TYPE = '[Auth] Register Failure';
@@ -25,6 +30,13 @@ export const loginFailure = createAction(
   LOGIN_FAILURE_TYPE,
   props<{ error: string }>()
 );
+
+export const logout = createAction(LOGOUT_TYPE);
+
+export const logoutSuccess = createAction(LOGOUT_SUCCESS_TYPE);
+
+export const logoutFailure = createAction(LOGOUT_FAILURE_TYPE);
+
 
 export const register = createAction(
   REGISTER_TYPE,

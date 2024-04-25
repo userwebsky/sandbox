@@ -30,8 +30,11 @@
   <div class="d-flex justify-content-end">
     <button mat-raised-button color="primary">Zarejestruj się</button>
   </div>
-  <div class="alert alert-warning alert-dismissible fade show mt-2" role="alert">
+  <div class="alert alert-warning alert-dismissible fade show mt-2" role="alert" *ngIf="notMatchingPaswswordsError">
     {{ notMatchingPaswswordsError }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" *ngIf="notMatchingPaswswordsError" (click)="notMatchingPaswswordsError = null" ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" (click)="notMatchingPaswswordsError = null" ></button>
+  </div>
+  <div class="alert alert-warning alert-dismissible fade show mt-2" role="alert" *ngIf="errorMsg$ | async as error">
+    {{ error }}
   </div>
 </form>

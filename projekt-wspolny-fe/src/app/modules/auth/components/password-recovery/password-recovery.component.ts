@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { FormService } from "../../../core/services/form.service";
 import { FormControl, FormGroup } from "@angular/forms";
 import { RecoveryFrom } from "../../../core/models/forms.model";
+import { AuthService } from "../../../core/services/auth.service";
+import { NotifierService } from "angular-notifier";
 
 @Component({
   selector: 'app-password-recovery',
@@ -9,16 +11,35 @@ import { RecoveryFrom } from "../../../core/models/forms.model";
   styleUrls: ['./password-recovery.component.scss']
 })
 export class PasswordRecoveryComponent {
-  passwordsForm: FormGroup<RecoveryFrom> = this.formService.initPasswdRecoveryForm();
+  passwdRecoveryForm: FormGroup<RecoveryFrom> =
+    this.formService.initPasswdRecoveryForm();
 
-  get controls() {
-    return this.passwordsForm.controls;
+  errorMessage: null | string = null;
+
+  constructor(
+    private formService: FormService,
+    private authService: AuthService,
+    private notifierService: NotifierService
+  ) {}
+
+  getErrorMessage(email: FormControl<string>) {
+    return this.formService.getErrorMessage(email);
   }
 
-  constructor(private formService: FormService) {
+  onPasswdRecovery() {
+    this.authService
+      .resetPassword(this.passwdRecoveryForm.getRawValue())
+      .subscribe({
+        next: () => {
+          this.notifierService.notify(
+            'success',
+            'Jeśli podano prawidłowego e-maila to została wysłana na niego wiadomość.'
+          );
+        },
+        error: (err) => {
+          this.errorMessage = err;
+        },
+      });
   }
 
-  getErrorMessage(control: FormControl): string {
-    return this.formService.getErrorMessage(control);
-  }
 }

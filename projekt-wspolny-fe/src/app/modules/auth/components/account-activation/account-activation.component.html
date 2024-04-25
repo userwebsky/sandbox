@@ -1,1 +1,5 @@
-<p>account-activation works!</p>
+<p *ngIf='!errorMessage'>Trwa aktywacja konta</p>
+<div class='alert alert-warning alert-dismissible fade show mt-2' role='alert' *ngIf='errorMessage'>
+  {{ errorMessage }}
+</div>
+

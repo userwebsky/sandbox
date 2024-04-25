@@ -6,7 +6,7 @@ import * as AuthActions from '../../store/auth.actions'
 import { AppState } from "../../../../store/app.reducer";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { selectAuthError } from "../../store/auth.selectors";
+import { selectAuthError, selectAuthLoading } from "../../store/auth.selectors";
 
 @Component({
   selector: 'app-register',
@@ -17,6 +17,7 @@ export class RegisterComponent implements OnDestroy {
   registerForm: FormGroup<RegisterForm> = this.formService.initRegisterForm();
   notMatchingPaswswordsError: null | string = null;
   errorMsg$: Observable<string | null> = this.store.select(selectAuthError);
+  loadnig$: Observable<boolean> = this.store.select(selectAuthLoading);
 
   get controls() {
     return this.registerForm.controls;

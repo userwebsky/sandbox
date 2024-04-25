@@ -6,14 +6,15 @@ export const selectAuth = (state: AppState) => state.auth;
 
 export const selectAuthUser = createSelector(
   selectAuth,
-  (state: AuthState) => state.user // zwracamy usera
+  (state: AuthState) => state.user
 );
 
 export const selectAuthLoading = createSelector(
   selectAuth,
-  (state: AuthState) => state.loading // zwracamy loading
+  (state: AuthState) => state.loading
 );
 export const selectAuthError = createSelector(
   selectAuth,
-  (state: AuthState) => state.error //zwracamy error
+  (state: AuthState) => state.error
 );
+

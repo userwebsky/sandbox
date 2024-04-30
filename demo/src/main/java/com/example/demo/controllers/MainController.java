@@ -4,13 +4,22 @@ import com.example.demo.models.Family;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -55,6 +64,35 @@ public class MainController {
     cookie.setMaxAge(10);
     response.addCookie(cookie);
     return familyList;
+  }
+
+  @GetMapping("/download")
+  public ResponseEntity<Resource> downloadFile() throws IOException {
+
+    File file = new File("src/main/resources/static/test.txt");
+    Resource resource = new FileSystemResource(file);
+
+    return ResponseEntity.ok()
+      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+      .contentLength(file.length())
+      .contentType(MediaType.parseMediaType("application/octet-stream"))
+      .body(resource);
+  }
+
+  @GetMapping("/video")
+  public StreamingResponseBody streamVideo(HttpServletResponse response) throws IOException {
+    response.setContentType("video/mp4");
+    //InputStream videoFileStream = new FileInputStream(new File("path/asynchronicznosc.mp4"));
+    URL url = new URL("https://robert-programista.pl/wp-content/uploads/2022/02/asynchronicznosc.mp4");
+    InputStream videoFileStream = url.openStream();
+    return outputStream -> {
+      int nRead;
+      byte[] data = new byte[1024];
+      while ((nRead = videoFileStream.read(data, 0, data.length)) != -1) {
+        outputStream.write(data, 0, nRead);
+      }
+      videoFileStream.close();
+    };
   }
 
 }

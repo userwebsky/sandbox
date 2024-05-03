@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -17,8 +18,8 @@ public class FamilyService {
   private final FamilyRepository familyRepository;
   private final MemberRepository memberRepository;
 
-  public List<Family> getAllFamilies() {
-        return familyRepository.findAll();
+  public ResponseEntity<List<Family>> getAllFamilies() {
+        return ResponseEntity.ok(familyRepository.findAll());
     }
 
   public ResponseEntity<FamilyDTO> createFamily(FamilyDTO familyDTO) {
@@ -46,5 +47,21 @@ Family i jest pobierana leniwie, wówczas obowiązkowe jest zapisanie Member prz
     * */
 
     return ResponseEntity.ok(response);
+  }
+
+  public ResponseEntity<FamilyDTO> getFamilyById(long id) {
+    Optional<Family> familyOptional = familyRepository.findById(id);
+    if (familyOptional.isPresent()) {
+      Family family = familyOptional.get();
+      FamilyDTO familyDTO = FamilyMapper.mapFamilyToFamilyDTO(family);
+      return ResponseEntity.ok(familyDTO);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  public ResponseEntity<Void> deleteFamily(long id) {
+    familyRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
   }
 }

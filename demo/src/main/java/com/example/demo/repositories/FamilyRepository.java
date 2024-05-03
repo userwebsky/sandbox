@@ -10,4 +10,9 @@ import java.util.Optional;
 public interface FamilyRepository extends JpaRepository<Family,Long> {
   @Override
   Optional<Family> findById(Long id);
+
+  /*
+  @Query(value = "SELECT * FROM family where name=?1 and origin=?2",nativeQuery = true)
+    List<FamilyDB> findByname(String name, String origin);
+  * */
 }

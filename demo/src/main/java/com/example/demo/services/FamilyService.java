@@ -8,6 +8,7 @@ import com.example.demo.repositories.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,9 +20,10 @@ public class FamilyService {
   private final MemberRepository memberRepository;
 
   public ResponseEntity<List<Family>> getAllFamilies() {
-        return ResponseEntity.ok(familyRepository.findAll());
-    }
+    return ResponseEntity.ok(familyRepository.findAll());
+  }
 
+  @Transactional
   public ResponseEntity<FamilyDTO> createFamily(FamilyDTO familyDTO) {
     FamilyDTO response = null;
     try {

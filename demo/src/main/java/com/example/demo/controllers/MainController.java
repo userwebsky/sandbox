@@ -1,6 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.models.Family;
+import com.example.demo.models.FamilyDTO;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -57,13 +56,13 @@ public class MainController {
   }
 
   @GetMapping( "/getall")
-  public List<Family> getAll(HttpServletResponse response){
-    List<Family> familyList = new ArrayList<>();
-    response.setHeader("Length", String.valueOf(familyList.size()));
-    Cookie cookie = new Cookie("Length",String.valueOf(familyList.size()));
+  public List<FamilyDTO> getAll(HttpServletResponse response){
+    List<FamilyDTO> familyDTOList = new ArrayList<>();
+    response.setHeader("Length", String.valueOf(familyDTOList.size()));
+    Cookie cookie = new Cookie("Length",String.valueOf(familyDTOList.size()));
     cookie.setMaxAge(10);
     response.addCookie(cookie);
-    return familyList;
+    return familyDTOList;
   }
 
   @GetMapping("/download")

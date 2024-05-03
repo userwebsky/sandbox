@@ -1,38 +1,28 @@
 package com.example.demo.models;
 
-import org.springframework.lang.NonNull;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-
+@Entity
+@Table(name = "family")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Family {
-  private final String uid;
-  @NonNull
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
   private String name;
-  private List<Member> members;
+  private String origin;
 
-  public Family(String uid, String name, List<Member> members) {
-    this.uid = uid;
-    this.name = name;
-    this.members = members;
-  }
+  /*@OneToMany(mappedBy = "family", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<Member> members = new ArrayList<>();*/
 
-  public String getUid() {
-    return uid;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public List<Member> getMembers() {
-    return members;
-  }
-
-  public void setMembers(List<Member> members) {
-    this.members = members;
-  }
+  @OneToOne
+  @JoinColumn(name = "head")
+  private Member head;
 }

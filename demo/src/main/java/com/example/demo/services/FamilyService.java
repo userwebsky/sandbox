@@ -6,6 +6,7 @@ import com.example.demo.models.FamilyDTO;
 import com.example.demo.repositories.FamilyRepository;
 import com.example.demo.repositories.MemberRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class FamilyService {
   private final FamilyRepository familyRepository;
   private final MemberRepository memberRepository;
@@ -34,6 +36,7 @@ public class FamilyService {
       response = FamilyMapper.mapFamilyToFamilyDTO(family);
     } catch (Exception e) {
       e.printStackTrace();
+      log.error(e.getMessage());
     }
 
     /*

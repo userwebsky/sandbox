@@ -1,9 +1,11 @@
 package com.example.demo.controllers;
 
 import com.example.demo.models.FamilyDTO;
+import com.example.demo.services.DogApiService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,19 +20,27 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping(value = "/api/v1")
 public class MainController {
+  private final DogApiService dogApiService;
 
   @GetMapping("/hello")
     public String hello() {
         return "Hello World!";
     }
+
+  @GetMapping("/random-dog")
+  public ResponseEntity<?> randomDog() throws URISyntaxException {
+    return dogApiService.getRandomDogPicture();
+  }
 
   @GetMapping("/test-redirect")
   public ResponseEntity<String> testRedirect() {

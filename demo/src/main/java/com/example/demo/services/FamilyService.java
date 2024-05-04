@@ -66,4 +66,18 @@ Family i jest pobierana leniwie, wówczas obowiązkowe jest zapisanie Member prz
     familyRepository.deleteById(id);
     return ResponseEntity.noContent().build();
   }
+
+  public ResponseEntity<FamilyDTO> updateFamily(long id, FamilyDTO familyDTO) {
+    Optional<Family> familyOptional = familyRepository.findById(id);
+      if (familyOptional.isPresent()) {
+          Family family = familyOptional.get();
+          FamilyMapper.mapFamilyDTOToFamily(familyDTO, family);
+          memberRepository.save(family.getHead());
+          familyRepository.save(family);
+          FamilyDTO updatedFamilyDTO = FamilyMapper.mapFamilyToFamilyDTO(family);
+          return ResponseEntity.ok(updatedFamilyDTO);
+      } else {
+          return ResponseEntity.notFound().build();
+      }
+  }
 }

@@ -32,6 +32,11 @@ public class FamilyController {
       return familyService.createFamily(familyDTO);
   }
 
+  @PutMapping("/{id}")
+    public ResponseEntity<FamilyDTO> updateFamily(@PathVariable long id, @RequestBody @Validated FamilyDTO familyDTO) {
+        return familyService.updateFamily(id, familyDTO);
+    }
+
   @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFamily(@PathVariable long id) {
       return familyService.deleteFamily(id);

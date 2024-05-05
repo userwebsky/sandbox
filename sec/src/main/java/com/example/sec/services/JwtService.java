@@ -34,6 +34,7 @@ public class JwtService {
     return claimsResolver.apply(claims);
   }
 
+  @Deprecated
   private Claims extractAllClaims(String token) {
     return Jwts
       .parser()
@@ -43,12 +44,14 @@ public class JwtService {
       .getBody();
   }
 
+  //sprawdza czy token wygasł
   private Boolean isTokenExpired(String token) {
     return extractExpiration(token).before(new Date());
   }
 
   public Boolean validateToken(String token, UserDetails userDetails) {
     final String username = extractUsername(token);
+    //czy zgodny username zawarty w tokenie i czy token nie wygasł
     return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
   }
 
@@ -58,6 +61,7 @@ public class JwtService {
     return createToken(claims,userName);
   }
 
+  @Deprecated
   private String createToken(Map<String, Object> claims, String userName) {
     return Jwts.builder()
       .claims(claims)

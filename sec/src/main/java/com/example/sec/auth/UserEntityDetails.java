@@ -19,7 +19,7 @@ public class UserEntityDetails implements UserDetails {
   public UserEntityDetails(User user) {
     this.mail = user.getMail();
     this.password = user.getPassword();
-    this.isEnabled = user.isLoginDisabled();
+    this.isEnabled = !user.isLoginDisabled();
     this.authorities = Arrays.stream(user.getRoles().split(","))
       .map(SimpleGrantedAuthority::new).collect(Collectors.toList());
   }
@@ -41,17 +41,17 @@ public class UserEntityDetails implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return false;
+    return true;
   }
 
   @Override

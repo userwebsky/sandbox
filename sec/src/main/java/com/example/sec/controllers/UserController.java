@@ -23,6 +23,11 @@ public class UserController {
   private final JwtService jwtService;
   private final UserService createUser;
 
+  @GetMapping("/hello")
+  public String hello() {
+    return "Hello World!";
+  }
+
   @PostMapping("/new")
   public String addNewUser(@RequestBody User userInfo) {
     createUser.createUser(userInfo);

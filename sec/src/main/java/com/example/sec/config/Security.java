@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -57,8 +58,12 @@ public class Security {
     .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
      *
      *             */
-    http.csrf().disable()
-      .authorizeRequests(authorizeRequests ->
+    http
+      .csrf(csrf -> {
+        csrf.disable(); // CSRF --header 'X-XSRF-TOKEN: 3afec3' it is recommended to implement csrf support !!!
+        csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+      })
+      .authorizeHttpRequests(authorizeRequests ->
         authorizeRequests
           .requestMatchers("/hello","/new","/authenticate").permitAll() //każdy może korzystać
           .anyRequest().authenticated() //każdy inny endpoint wymaga autoryzacji
@@ -69,6 +74,7 @@ public class Security {
       )
       .authenticationProvider(authenticationProvider())
       .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
     return http.build();
     /*
 csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) - Włącza ochronę przed atakami CSRF (Cross-Site Request Forgery). Token CSRF jest generowany i przechowywany w plikach cookie. Flag withHttpOnlyFalse pozwala JavaScriptowi na odczytanie plików cookie, co jest niezbędne do przesyłania tokena CSRF wraz z żądaniem.

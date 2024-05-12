@@ -2,13 +2,12 @@ package com.example.sec.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,14 +34,11 @@ public class JwtService {
     return claimsResolver.apply(claims);
   }
 
-  @Deprecated
   private Claims extractAllClaims(String token) {
     return Jwts
       .parser()
-      .setSigningKey(getSignKey())
-      .build()
-      .parseClaimsJws(token)
-      .getBody();
+      .verifyWith(getSignKey())
+      .build().parseSignedClaims(token).getPayload();
   }
 
   //sprawdza czy token wygasł
@@ -62,17 +58,16 @@ public class JwtService {
     return createToken(claims,userName);
   }
 
-  @Deprecated
   private String createToken(Map<String, Object> claims, String userName) {
     return Jwts.builder()
       .claims(claims)
       .subject(userName)
       .issuedAt(new Date(System.currentTimeMillis()))
       .expiration(new Date(System.currentTimeMillis()+1000*60*30))
-      .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+      .signWith(getSignKey()).compact();
   }
 
-  private Key getSignKey() {
+  private SecretKey getSignKey() {
     byte[] keyBytes= Decoders.BASE64.decode(SECRET);
     return Keys.hmacShaKeyFor(keyBytes);
   }

@@ -9,7 +9,7 @@ import org.mapstruct.Mappings;
 public abstract class TranslatorFamilyDBtoFamilyDTO {
 
     public FamilyExtendedDTO TofamilyExtendedDTO(FamilyDB familyDB){
-        FamilyExtendedDTO familyExtendedDTO = TofamilyDTO(familyDB);
+        FamilyExtendedDTO familyExtendedDTO = toFamilyExtendedDTO(familyDB);
         return familyExtendedDTO;
     }
     public FamilyDTO toFamily(FamilyDB familyDB){
@@ -28,7 +28,7 @@ public abstract class TranslatorFamilyDBtoFamilyDTO {
             @Mapping(source = "origin", target = "origin"),
             @Mapping(expression = "java(toMemberDTO(familyDB.getHead()))", target = "head"),
     })
-    protected abstract FamilyExtendedDTO TofamilyDTO(FamilyDB familyDB);
+    protected abstract FamilyExtendedDTO toFamilyExtendedDTO(FamilyDB familyDB);
 
 
     @Mappings({

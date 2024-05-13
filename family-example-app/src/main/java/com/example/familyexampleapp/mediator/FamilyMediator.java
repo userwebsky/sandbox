@@ -1,9 +1,8 @@
 package com.example.familyexampleapp.mediator;
 
-import com.example.familyexampleapp.model.FamilyDB;
-import com.example.familyexampleapp.model.FamilyDTO;
-import com.example.familyexampleapp.model.FamilyExtendedDTO;
+import com.example.familyexampleapp.model.*;
 import com.example.familyexampleapp.services.FamilyService;
+import com.example.familyexampleapp.services.MemberService;
 import com.example.familyexampleapp.translator.TranslatorFamilyDBtoFamilyDTO;
 import com.example.familyexampleapp.translator.TranslatorFamilyTDOtoFamilyDB;
 import com.example.familyexampleapp.translator.TranslatorMemberDBToMemberDTO;
@@ -15,17 +14,20 @@ public class FamilyMediator {
   TranslatorMemberDBToMemberDTO memberDBToMemberDTO;
   TranslatorFamilyTDOtoFamilyDB translatorFamilyTDOtoFamilyDB;
   FamilyService familyService;
+  MemberService memberService;
 
   public FamilyMediator(
     TranslatorFamilyDBtoFamilyDTO translatorFamilyDBtoFamilyDTO,
     TranslatorMemberDBToMemberDTO memberDBToMemberDTO,
     FamilyService familyService,
-    TranslatorFamilyTDOtoFamilyDB translatorFamilyTDOtoFamilyDB
+    TranslatorFamilyTDOtoFamilyDB translatorFamilyTDOtoFamilyDB,
+    MemberService memberService
   ) {
     this.translatorFamilyDBtoFamilyDTO = translatorFamilyDBtoFamilyDTO;
     this.memberDBToMemberDTO = memberDBToMemberDTO;
     this.familyService = familyService;
     this.translatorFamilyTDOtoFamilyDB = translatorFamilyTDOtoFamilyDB;
+    this.memberService = memberService;
   }
 
   public void saveFamily(FamilyDTO familyDTO) {
@@ -36,5 +38,15 @@ public class FamilyMediator {
   public void updateFamily(FamilyExtendedDTO familyDTO) {
     FamilyDB familyDB = translatorFamilyTDOtoFamilyDB.toFamilyDB(familyDTO);
     familyService.save(familyDB);
+  }
+
+  public void saveMember(MembersDTO memberDTO) {
+    MembersDB membersDB = (memberDTO);
+    memberService.save(membersDB);
+  }
+
+  public void updateMember(MembersExtendedDTO memberDTO) {
+    MembersDB membersDB = (memberDTO);
+    memberService.save(membersDB);
   }
 }

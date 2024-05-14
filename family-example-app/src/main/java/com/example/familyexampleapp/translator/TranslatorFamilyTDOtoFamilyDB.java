@@ -22,6 +22,7 @@ public abstract class TranslatorFamilyTDOtoFamilyDB {
 
   @Mappings({
     @Mapping(target = "id", ignore = true),
+    @Mapping(target = "head", ignore = true),
     @Mapping(target = "name", source = "name"),
     @Mapping(target = "origin", source = "origin")
   })
@@ -31,7 +32,7 @@ public abstract class TranslatorFamilyTDOtoFamilyDB {
     @Mapping(target = "id", ignore = true),
     @Mapping(target = "name", source = "name"),
     @Mapping(target = "origin", source = "origin"),
-    @Mapping(target = "head", expression = "java(toFamilyDBMap(familyExtendedDTO.getHead))")
+    @Mapping(target = "head", expression = "java(toFamilyDBMap(familyExtendedDTO.getHead()))")
   })
   protected abstract FamilyDB toFamilyDBMap(FamilyExtendedDTO familyExtendedDTO);
 

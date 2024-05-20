@@ -1,5 +1,6 @@
 package com.example.auth.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import java.sql.Timestamp;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class AuthResponse {
   private final String timestamp;
   private final String message;

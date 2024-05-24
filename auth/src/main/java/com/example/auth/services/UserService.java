@@ -11,11 +11,21 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
 
   public User saveUser(User user) {
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     return userRepository.saveAndFlush(user);
   }
+
+  public String generateToken(String username) {
+    return jwtService.generateToken(username);
+  }
+
+  public void validateToken(String token) {
+    jwtService.validateToken(token);
+  }
+
 
 
 }

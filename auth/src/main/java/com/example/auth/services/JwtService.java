@@ -33,18 +33,17 @@ public class JwtService {
     return Keys.hmacShaKeyFor(keyBytes);
   }
 
-  public String generateToken(String username) {
-    Map<String, Object> claims = new HashMap<>();
-    return createToken(claims, username);
+  public String generateToken(String username,int exp){
+    Map<String, Object> claimns = new HashMap<>();
+    return createToken(claimns,username,exp);
   }
 
-  private String createToken(Map<String, Object> claims, String username) {
+  public String createToken(Map<String,Object> claims, String username,int exp){
     return Jwts.builder()
-              .setClaims(claims)
-              .setSubject(username)
-              .setIssuedAt(new Date(System.currentTimeMillis()))
-              .setExpiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION))
-              .signWith(getSignKey(), SignatureAlgorithm.HS512)
-              .compact();
+      .setClaims(claims)
+      .setSubject(username)
+      .setIssuedAt(new Date(System.currentTimeMillis()))
+      .setExpiration(new Date(System.currentTimeMillis()+exp))
+      .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
   }
 }

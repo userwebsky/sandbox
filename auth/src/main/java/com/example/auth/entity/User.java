@@ -33,7 +33,7 @@ public class User implements UserDetails {
   private boolean isEnabled;
 
   public User() {
-    genereteUuid();
+    generateUuid();
   }
 
   public User(long id, String uuid, String login, String email, String password,
@@ -46,9 +46,21 @@ public class User implements UserDetails {
     this.role = role;
     this.isLock = isLock;
     this.isEnabled = isEnabled;
-    genereteUuid();
+    generateUuid();
   }
 
+  public Role getRole(){
+    return this.role;
+  }
+  public String getUuid(){
+    return this.uuid;
+  }
+  private long getId(){
+    return id;
+  }
+  public String getEmail() {
+    return email;
+  }
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return List.of(new SimpleGrantedAuthority(role.name()));
@@ -83,10 +95,10 @@ public class User implements UserDetails {
   public boolean isEnabled() {
     return isEnabled;
   }
-
-  private void genereteUuid() {
-    if (uuid == null || uuid.isEmpty()) {
-      uuid = UUID.randomUUID().toString();
+  private void generateUuid(){
+    if (uuid == null || uuid.equals("")){
+      setUuid(UUID.randomUUID().toString());
     }
   }
+
 }

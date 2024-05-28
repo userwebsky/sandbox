@@ -1,5 +1,6 @@
 package com.example.auth.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -14,17 +15,13 @@ import java.util.Map;
 
 @Component
 public class JwtService {
-  @Value("${jwt.secret}")
   public final String SECRET;
 
-  public final int TOKEN_EXPIRATION;
-
-  public JwtService(@Value("${jwt.secret}") String secret, @Value("${jwt.exp}") int expiration) {
-    this.SECRET = secret;
-    this.TOKEN_EXPIRATION = expiration;
+  public JwtService(@Value("${jwt.secret}") String secret) {
+    SECRET = secret;
   }
 
-  public void validateToken(final String token) {
+  public void validateToken(final String token) throws ExpiredJwtException, IllegalArgumentException {
     Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
   }
 
@@ -33,17 +30,31 @@ public class JwtService {
     return Keys.hmacShaKeyFor(keyBytes);
   }
 
-  public String generateToken(String username,int exp){
+  public String generateToken(String username, int exp) {
     Map<String, Object> claimns = new HashMap<>();
-    return createToken(claimns,username,exp);
+    return createToken(claimns, username, exp);
   }
 
-  public String createToken(Map<String,Object> claims, String username,int exp){
+  public String createToken(Map<String, Object> claims, String username, int exp) {
     return Jwts.builder()
       .setClaims(claims)
       .setSubject(username)
       .setIssuedAt(new Date(System.currentTimeMillis()))
-      .setExpiration(new Date(System.currentTimeMillis()+exp))
+      .setExpiration(new Date(System.currentTimeMillis() + exp))
       .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+  }
+
+  public String getSubject(final String token) {
+    return Jwts
+      .parser()
+      .setSigningKey(SECRET)
+      .parseClaimsJws(token)
+      .getBody()
+      .getSubject();
+  }
+
+  public String refreshToken(final String token, int exp) {
+    String username = getSubject(token);
+    return generateToken(username, exp);
   }
 }

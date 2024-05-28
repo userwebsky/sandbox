@@ -9,11 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface ResetOperationsRepository  extends JpaRepository<ResetOperations,Long> {
+public interface ResetOperationsRepository extends JpaRepository<ResetOperations, Long> {
 
   @Modifying
   void deleteAllByUser(User user);
+
   Optional<ResetOperations> findByUid(String uid);
+
   @Query(nativeQuery = true, value = "SELECT * FROM resetoperations where createdate <= current_timestamp - INTERVAL '15 minutes'")
   List<ResetOperations> findExpiredOperations();
 

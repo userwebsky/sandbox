@@ -27,9 +27,9 @@ public class User implements UserDetails {
   private String password;
   @Enumerated(EnumType.STRING)
   private Role role;
-  @Column(name="islock")
+  @Column(name = "islock")
   private boolean isLock;
-  @Column(name="isenable")
+  @Column(name = "isenable")
   private boolean isEnabled;
 
   public User() {
@@ -49,18 +49,22 @@ public class User implements UserDetails {
     generateUuid();
   }
 
-  public Role getRole(){
+  public Role getRole() {
     return this.role;
   }
-  public String getUuid(){
+
+  public String getUuid() {
     return this.uuid;
   }
-  private long getId(){
+
+  private long getId() {
     return id;
   }
+
   public String getEmail() {
     return email;
   }
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return List.of(new SimpleGrantedAuthority(role.name()));
@@ -95,8 +99,9 @@ public class User implements UserDetails {
   public boolean isEnabled() {
     return isEnabled;
   }
-  private void generateUuid(){
-    if (uuid == null || uuid.equals("")){
+
+  private void generateUuid() {
+    if (uuid == null || uuid.equals("")) {
       setUuid(UUID.randomUUID().toString());
     }
   }

@@ -1,23 +1,23 @@
 package org.example.house;
 
 public class House {
-    private String walls;
-    private String floors;
-    private String rooms;
-    private String roof;
-    private String windows;
-    private String doors;
-    private String garage;
+  private String walls;
+  private String floors;
+  private String rooms;
+  private String roof;
+  private String windows;
+  private String doors;
+  private String garage;
 
-    private House(Builder builder) {
-      this.walls = builder.walls;
-        this.floors = builder.floors;
-        this.rooms = builder.rooms;
-        this.roof = builder.roof;
-        this.windows = builder.windows;
-        this.doors = builder.doors;
-        this.garage = builder.garage;
-    }
+  private House(Builder builder) {
+    this.walls = builder.walls;
+    this.floors = builder.floors;
+    this.rooms = builder.rooms;
+    this.roof = builder.roof;
+    this.windows = builder.windows;
+    this.doors = builder.doors;
+    this.garage = builder.garage;
+  }
 
   public String getWalls() {
     return walls;
@@ -71,12 +71,37 @@ public class House {
 
     public Builder builderWalls(String walls) {
       this.walls = walls;
-        return this;
+      return this;
     }
 
     public Builder builderFloors(String floors) {
-          this.floors = floors;
-          return this;
+      this.floors = floors;
+      return this;
+    }
+
+    public Builder builderRooms(String rooms) {
+      this.rooms = rooms;
+      return this;
+    }
+
+    public Builder builderRoof(String roof) {
+      this.roof = roof;
+      return this;
+    }
+
+    public Builder builderWindows(String windows) {
+      this.windows = windows;
+      return this;
+    }
+
+    public Builder builderDoors(String doors) {
+      this.doors = doors;
+      return this;
+    }
+
+    public Builder builderGarage(String garage) {
+      this.garage = garage;
+      return this;
     }
 
     public House build() {

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,7 +33,7 @@ class KryoMigrationTest {
   @Autowired
   private KryoService kryoService;
 
-  // Dostarcza WSZYSTKIE typy danych z ComplexTestObject jako osobne przypadki testowe
+  // Dostarcza dane (te same co w Etapie 1, aby zweryfikować poprawność odczytu)
   static Stream<Arguments> provideTestObjects() {
     return Stream.of(
       // --- 1. Prymitywy ---
@@ -48,7 +49,6 @@ class KryoMigrationTest {
       // --- 2. Wrappery ---
       Arguments.of("wrapper_integer", Integer.valueOf(100)),
       Arguments.of("wrapper_double", Double.valueOf(55.55)),
-      // Wrapper Boolean.FALSE jest specyficzny w Kryo (czasem zapisywany jako stała)
       Arguments.of("wrapper_boolean", Boolean.FALSE),
 
       // --- 3. Tekst ---
@@ -67,7 +67,7 @@ class KryoMigrationTest {
       Arguments.of("collection_hashset", new HashSet<>(Arrays.asList("Set1", "Set2"))),
       Arguments.of("collection_treeset", new TreeSet<>(Arrays.asList(1, 5))),
 
-      // --- 6. Mapy (POPRAWKA: Używamy metod pomocniczych zamiast {{ }} double brace init) ---
+      // --- 6. Mapy ---
       Arguments.of("map_hashmap", createHashMap()),
       Arguments.of("map_treemap", createTreeMap()),
       Arguments.of("map_concurrent", createConcurrentMap()),
@@ -90,49 +90,43 @@ class KryoMigrationTest {
       // --- 10. Nested Object ---
       Arguments.of("nested_object", new ComplexTestObject.NestedObject("Nested", 99)),
 
-      // --- 11. Pełny, Złożony Obiekt (Integration Test) ---
+      // --- 11. Pełny, Złożony Obiekt ---
       Arguments.of("complex_object_full", ComplexTestObject.createFullObject())
     );
   }
 
-  // --- Metody pomocnicze do tworzenia Map (unikamy anonimowych podklas) ---
+  // Metody pomocnicze (identyczne jak w Etapie 1)
   private static HashMap<String, String> createHashMap() {
     HashMap<String, String> map = new HashMap<>();
     map.put("Key1", "Val1");
     map.put("Key2", "Val2");
     return map;
   }
-
   private static TreeMap<Integer, String> createTreeMap() {
     TreeMap<Integer, String> map = new TreeMap<>();
     map.put(1, "One");
     map.put(10, "Ten");
     return map;
   }
-
   private static ConcurrentHashMap<String, Integer> createConcurrentMap() {
     ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
     map.put("Concurrent", 100);
     return map;
   }
 
-  @ParameterizedTest(name = "Serializacja: {0}")
+  // --- ETAP 1 (WYŁĄCZONY) ---
+  // Nie chcemy nadpisywać plików wzorcowych nowym Kryo!
+  @Disabled("Wyłączone w Etapie 2 - nie nadpisujemy plików wzorcowych")
+  @ParameterizedTest
   @MethodSource("provideTestObjects")
   @Order(1)
-  void testSerializationAndDumpToFile(String testName, Object data) throws IOException {
-    System.out.println("--- ZAPIS: " + testName + " ---");
-
-    String serializedData = kryoService.serialize(data);
-    Assertions.assertNotNull(serializedData);
-
-    String fileName = "kryo_v4_" + testName + ".b64";
-    Path path = Paths.get(fileName);
-    Files.write(path, serializedData.getBytes());
-
-    System.out.println("Utworzono plik: " + fileName + " (" + serializedData.length() + " znaków)");
+  void testSerializationAndDumpToFile(String testName, Object data) {
+    // ... (kod wyłączony)
   }
 
-  @ParameterizedTest(name = "Weryfikacja: {0}")
+  // --- ETAP 2 (URUCHAMIAMY) ---
+  // Próbujemy czytać pliki z Etapu 1 nową wersją Kryo i Javy
+  @ParameterizedTest(name = "Próba deserializacji Legacy: {0}")
   @MethodSource("provideTestObjects")
   @Order(2)
   void testDeserializationVerification(String testName, Object expectedData) throws IOException {
@@ -140,35 +134,49 @@ class KryoMigrationTest {
     Path path = Paths.get(fileName);
 
     if (!Files.exists(path)) {
-      Assertions.fail("Brak pliku: " + fileName);
+      // Jeśli pliku nie ma, to znaczy że Etap 1 nie został poprawnie zakończony
+      Assertions.fail("Brak pliku wzorcowego: " + fileName);
     }
 
     String readData = Files.lines(path).collect(Collectors.joining());
-    Object actualData = kryoService.deserialize(readData);
 
-    Assertions.assertNotNull(actualData, "Wynik deserializacji jest null: " + testName);
+    System.out.println("Próba deserializacji: " + testName);
 
-    // Logika porównania
-    if (expectedData.getClass().isArray()) {
-      if (expectedData instanceof int[]) Assertions.assertArrayEquals((int[]) expectedData, (int[]) actualData);
-      else if (expectedData instanceof long[]) Assertions.assertArrayEquals((long[]) expectedData, (long[]) actualData);
-      else if (expectedData instanceof double[]) Assertions.assertArrayEquals((double[]) expectedData, (double[]) actualData);
-      else if (expectedData instanceof float[]) Assertions.assertArrayEquals((float[]) expectedData, (float[]) actualData);
-      else if (expectedData instanceof byte[]) Assertions.assertArrayEquals((byte[]) expectedData, (byte[]) actualData);
-      else if (expectedData instanceof char[]) Assertions.assertArrayEquals((char[]) expectedData, (char[]) actualData);
-      else if (expectedData instanceof boolean[]) Assertions.assertArrayEquals((boolean[]) expectedData, (boolean[]) actualData);
-      else if (expectedData instanceof short[]) Assertions.assertArrayEquals((short[]) expectedData, (short[]) actualData);
-      else Assertions.assertArrayEquals((Object[]) expectedData, (Object[]) actualData);
-    } else {
-      Assertions.assertEquals(expectedData, actualData, "Błąd danych dla: " + testName);
+    try {
+      Object actualData = kryoService.deserialize(readData);
+
+      // Jeśli deserializacja się udała (mało prawdopodobne przy default config), sprawdzamy dane
+      Assertions.assertNotNull(actualData);
+
+      // Logika porównania
+      if (expectedData.getClass().isArray()) {
+        if (expectedData instanceof int[]) Assertions.assertArrayEquals((int[]) expectedData, (int[]) actualData);
+        else if (expectedData instanceof long[]) Assertions.assertArrayEquals((long[]) expectedData, (long[]) actualData);
+        else if (expectedData instanceof double[]) Assertions.assertArrayEquals((double[]) expectedData, (double[]) actualData);
+        else if (expectedData instanceof float[]) Assertions.assertArrayEquals((float[]) expectedData, (float[]) actualData);
+        else if (expectedData instanceof byte[]) Assertions.assertArrayEquals((byte[]) expectedData, (byte[]) actualData);
+        else if (expectedData instanceof char[]) Assertions.assertArrayEquals((char[]) expectedData, (char[]) actualData);
+        else if (expectedData instanceof boolean[]) Assertions.assertArrayEquals((boolean[]) expectedData, (boolean[]) actualData);
+        else if (expectedData instanceof short[]) Assertions.assertArrayEquals((short[]) expectedData, (short[]) actualData);
+        else Assertions.assertArrayEquals((Object[]) expectedData, (Object[]) actualData);
+      } else {
+        Assertions.assertEquals(expectedData, actualData, "Błąd danych dla: " + testName);
+      }
+
+      if (actualData instanceof ComplexTestObject) {
+        ComplexTestObject obj = (ComplexTestObject) actualData;
+        Assertions.assertSame(obj, obj.getSelfReference());
+      }
+
+      System.out.println("SUKCES (Niespodziewany!): " + testName);
+
+    } catch (Exception e) {
+      // W Etapie 2 SPODZIEWAMY SIĘ BŁĘDÓW.
+      // Wypisujemy je, abyś mógł je przeanalizować.
+      System.err.println("OCZEKIWANY BŁĄD dla " + testName + ": " + e.getClass().getSimpleName() + " -> " + e.getMessage());
+      // Rzucamy dalej, aby test zaświecił się na czerwono (chyba że wolisz, żeby przeszedł, jeśli złapie błąd?)
+      // Skoro to POC, niech testy failują, żebyśmy widzieli co trzeba naprawić w Etapie 3.
+      throw e;
     }
-
-    // Specjalne sprawdzenie dla cyklu w complex_object_full
-    if (actualData instanceof ComplexTestObject) {
-      ComplexTestObject obj = (ComplexTestObject) actualData;
-      Assertions.assertSame(obj, obj.getSelfReference(), "Utracono cykliczną referencję w " + testName);
-    }
-
-    System.out.println("ODCZYT OK: " + testName);
   }
 }

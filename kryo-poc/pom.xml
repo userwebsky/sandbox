@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.18</version> <!-- Ostatnia linia LTS wspierająca Java 8 -->
+    <version>3.2.3</version> <!-- Spring Boot 3 wymaga Java 17 -->
     <relativePath/>
   </parent>
 
@@ -16,8 +16,8 @@
   <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <java.version>1.8</java.version>
-    <kryo.version>4.0.2</kryo.version>
+    <java.version>17</java.version> <!-- Podnosimy wersję Java -->
+    <kryo.version>5.6.2</kryo.version> <!-- Podnosimy wersję Kryo -->
   </properties>
 
   <dependencies>
@@ -26,14 +26,14 @@
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
 
-    <!-- Kryo 4.x -->
+    <!-- Kryo 5.x -->
     <dependency>
       <groupId>com.esotericsoftware</groupId>
       <artifactId>kryo</artifactId>
       <version>${kryo.version}</version>
     </dependency>
 
-    <!-- Lombok dla czytelności POJO (opcjonalnie, ale ułatwia testy) -->
+    <!-- Lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>

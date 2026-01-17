@@ -3,8 +3,8 @@ package org.example.kryopoc.services;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.springframework.stereotype.Service;
 import org.objenesis.strategy.StdInstantiatorStrategy;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,14 +14,20 @@ import java.util.Base64;
 public class KryoService {
 
   /**
-   * Konfiguracja Kryo 4.x.
-   * Dodano StdInstantiatorStrategy, aby obsługiwać klasy bez konstruktora bezargumentowego
-   * (takie jak UUID czy Arrays.asList), co jest standardem w większości wdrożeń.
+   * Konfiguracja Kryo 5.x.
+   * UWAGA: W Kryo 5 domyślne ustawienia są inne niż w Kryo 4!
+   * - registrationRequired jest domyślnie TRUE (w Kryo 4 było false).
+   * - Inne mechanizmy obsługi referencji i stringów.
+   * * Na potrzeby Etapu 2 celowo zostawiamy "naiwną" konfigurację new Kryo(),
+   * aby zademonstrować błędy migracji.
    */
   private Kryo createKryoInstance() {
     Kryo kryo = new Kryo();
-    // Fallback: jeśli nie ma konstruktora bezargumentowego, użyj Objenesis (StdInstantiatorStrategy)
-    kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+
+    // Utrzymujemy strategię instancjonowania (to się nie zmieniło drastycznie w API),
+    // aby w ogóle móc próbować tworzyć obiekty bez konstruktorów.
+    kryo.setInstantiatorStrategy(new org.objenesis.strategy.StdInstantiatorStrategy());
+
     return kryo;
   }
 

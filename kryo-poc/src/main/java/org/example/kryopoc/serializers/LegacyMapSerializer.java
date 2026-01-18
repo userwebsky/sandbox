@@ -4,13 +4,10 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class LegacyMapSerializer extends Serializer<Map> {
 
   @Override
@@ -41,10 +38,6 @@ public class LegacyMapSerializer extends Serializer<Map> {
     if (type == HashMap.class) return new HashMap();
     if (type == TreeMap.class) return new TreeMap();
     if (type == ConcurrentHashMap.class) return new ConcurrentHashMap();
-    try {
-      return type.newInstance();
-    } catch (Exception e) {
-      return new HashMap();
-    }
+    try { return type.newInstance(); } catch (Exception e) { return new HashMap(); }
   }
 }

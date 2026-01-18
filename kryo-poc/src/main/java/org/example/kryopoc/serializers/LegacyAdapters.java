@@ -9,6 +9,7 @@ import com.esotericsoftware.kryo.io.Output;
 public class LegacyAdapters {
 
   // --- HELPERY: VarInt (Logic from Kryo 4) ---
+  // Używamy readByte/writeByte, aby automatycznie aktualizować pozycję Input/Output.
 
   public static int writeVarIntLegacy(Output output, int value, boolean optimizePositive) throws KryoException {
     if (!optimizePositive) value = (value << 1) ^ (value >> 31);
@@ -43,10 +44,7 @@ public class LegacyAdapters {
   }
 
   public static int readVarIntLegacy(Input input, boolean optimizePositive) throws KryoException {
-    // Używamy input.readByte(), który dba o sprawdzanie bufora i inkrementację pozycji!
-    // Dzięki temu nie musimy ręcznie zarządzać buffer/position.
-
-    int b = input.readByte() & 0xFF; // readByte zwraca byte, rzutujemy na int unsigned
+    int b = input.readByte() & 0xFF;
     int result = b & 0x7F;
     if ((b & 0x80) != 0) {
       b = input.readByte() & 0xFF;
@@ -67,8 +65,7 @@ public class LegacyAdapters {
     return optimizePositive ? result : ((result >>> 1) ^ -(result & 1));
   }
 
-  // --- HELPERY: Fixed Big Endian (dla Float/Double/Short/Char) ---
-  // Bez zmian, używają metod Input/Output
+  // --- HELPERY: Fixed Big Endian ---
 
   public static void writeIntBigEndian(Output output, int value) {
     output.writeByte(value >>> 24);
@@ -84,7 +81,6 @@ public class LegacyAdapters {
       (input.readByte() & 0xFF);
   }
 
-  // ... writeLongBigEndian / readLongBigEndian (bez zmian) ...
   public static void writeLongBigEndian(Output output, long value) {
     output.writeByte((int) (value >>> 56));
     output.writeByte((int) (value >>> 48));
@@ -107,7 +103,7 @@ public class LegacyAdapters {
       ((long) (input.readByte() & 0xFF));
   }
 
-  // --- SERIALIZERY WRAPPERÓW (Dla kompletności) ---
+  // --- SERIALIZERY WRAPPERÓW (Fixed Big Endian) ---
   public static class LegacyDoubleSerializer extends Serializer<Double> {
     { setImmutable(true); }
     public void write(Kryo kryo, Output output, Double object) { writeLongBigEndian(output, Double.doubleToLongBits(object)); }
@@ -118,26 +114,15 @@ public class LegacyAdapters {
     public void write(Kryo kryo, Output output, Float object) { writeIntBigEndian(output, Float.floatToIntBits(object)); }
     public Float read(Kryo kryo, Input input, Class<? extends Float> type) { return Float.intBitsToFloat(readIntBigEndian(input)); }
   }
-  // ... Short, Char, Boolean, Byte ... (bez zmian)
   public static class LegacyShortSerializer extends Serializer<Short> {
     { setImmutable(true); }
-    public void write(Kryo kryo, Output output, Short object) {
-      output.writeByte(object >>> 8);
-      output.writeByte(object.intValue());
-    }
-    public Short read(Kryo kryo, Input input, Class<? extends Short> type) {
-      return (short) (((input.readByte() & 0xFF) << 8) | (input.readByte() & 0xFF));
-    }
+    public void write(Kryo kryo, Output output, Short object) { output.writeByte(object >>> 8); output.writeByte(object.intValue()); }
+    public Short read(Kryo kryo, Input input, Class<? extends Short> type) { return (short) (((input.readByte() & 0xFF) << 8) | (input.readByte() & 0xFF)); }
   }
   public static class LegacyCharSerializer extends Serializer<Character> {
     { setImmutable(true); }
-    public void write(Kryo kryo, Output output, Character object) {
-      output.writeByte(object >>> 8);
-      output.writeByte(object.charValue());
-    }
-    public Character read(Kryo kryo, Input input, Class<? extends Character> type) {
-      return (char) (((input.readByte() & 0xFF) << 8) | (input.readByte() & 0xFF));
-    }
+    public void write(Kryo kryo, Output output, Character object) { output.writeByte(object >>> 8); output.writeByte(object.charValue()); }
+    public Character read(Kryo kryo, Input input, Class<? extends Character> type) { return (char) (((input.readByte() & 0xFF) << 8) | (input.readByte() & 0xFF)); }
   }
   public static class LegacyBooleanSerializer extends Serializer<Boolean> {
     { setImmutable(true); }

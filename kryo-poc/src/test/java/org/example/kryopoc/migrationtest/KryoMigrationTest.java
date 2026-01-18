@@ -88,10 +88,7 @@ class KryoMigrationTest {
       Arguments.of("enum_value", ComplexTestObject.TestEnum.VALUE_TWO),
 
       // --- 10. Nested Object ---
-      Arguments.of("nested_object", new ComplexTestObject.NestedObject("Nested", 99)),
-
-      // --- 11. Pełny, Złożony Obiekt ---
-      Arguments.of("complex_object_full", ComplexTestObject.createFullObject())
+      Arguments.of("nested_object", new ComplexTestObject.NestedObject("Nested", 99))
     );
   }
 

@@ -165,4 +165,16 @@ public class LegacyAdapters {
       return input.readBoolean();
     }
   }
+
+  public static class LegacyByteSerializer extends Serializer<Byte> {
+    { setImmutable(true); }
+    @Override
+    public void write(Kryo kryo, Output output, Byte object) {
+      output.writeByte(object);
+    }
+    @Override
+    public Byte read(Kryo kryo, Input input, Class<? extends Byte> type) {
+      return input.readByte();
+    }
+  }
 }

@@ -22,47 +22,45 @@ public class KryoService {
     Kryo kryo = new Kryo();
 
     kryo.setRegistrationRequired(false);
-    kryo.setReferences(true);
+    kryo.setReferences(true); // Globalnie włączone
     kryo.setInstantiatorStrategy(new org.objenesis.strategy.StdInstantiatorStrategy());
 
     // --- KONFIGURACJA DLA KRYO 4 ---
 
-    // 1. PRYMITYWY i WRAPPERY
-    // Int: VarInt (optimizePositive=true). Long: VarLong (ZigZag).
-    // Wyłączamy referencje dla wrapperów, aby readClassAndObject nie szukało RefID w danych.
-    kryo.register(int.class, new LegacyIntSerializer());
-    kryo.register(Integer.class, new LegacyIntSerializer()); // Domyślnie immutable=true w serializerze
-
-    kryo.register(long.class, new LegacyLongSerializer());
+    // 1. WRAPPERY (BEZ REFERENCJI, ZigZag dla Int/Long, FixedBE dla reszty)
+    kryo.register(Integer.class, new LegacyIntSerializer());
     kryo.register(Long.class, new LegacyLongSerializer());
-
-    // Float/Double/Short/Char/Boolean - Fixed Big Endian
-    kryo.register(Double.class, new LegacyAdapters.LegacyDoubleSerializer());
     kryo.register(Float.class, new LegacyAdapters.LegacyFloatSerializer());
-    kryo.register(Short.class, new LegacyAdapters.LegacyShortSerializer());
-    kryo.register(Character.class, new LegacyAdapters.LegacyCharSerializer());
+    kryo.register(Double.class, new LegacyAdapters.LegacyDoubleSerializer());
     kryo.register(Boolean.class, new LegacyAdapters.LegacyBooleanSerializer());
+    kryo.register(Byte.class, new LegacyAdapters.LegacyByteSerializer()); // Trzeba dodać klasę ByteSerializer do LegacyAdapters
+    kryo.register(Character.class, new LegacyAdapters.LegacyCharSerializer());
+    kryo.register(Short.class, new LegacyAdapters.LegacyShortSerializer());
 
-    // 2. TABLICE (Naprawiają błąd "Expected 5 Actual 0")
-    // Twoja implementacja LegacyIntArraySerializer jest poprawna dla Kryo 4 (length+1, VarInt elements).
-    kryo.register(int[].class, new LegacyIntArraySerializer());
-    kryo.register(String[].class, new LegacyStringArraySerializer());
-    // kryo.register(Object[].class, new LegacyObjectArraySerializer()); // Warto dodać dla array_mixed_objects
-
-    // 3. STRING
+    // String (BEZ REFERENCJI)
     kryo.register(String.class, new LegacyStringSerializer());
 
-    // 4. KOLEKCJE i MAPY
+    // Prymitywy (int.class itp.) - tutaj referencje nie mają znaczenia (nie są obiektami),
+    // ale rejestrujemy serializer dla "Top Level" testów.
+    kryo.register(int.class, new LegacyIntSerializer());
+    kryo.register(long.class, new LegacyLongSerializer());
+
+    // 2. TABLICE (MAJĄ REFERENCJE - domyślnie)
+    kryo.register(int[].class, new LegacyIntArraySerializer());
+    kryo.register(String[].class, new LegacyStringArraySerializer());
+    // ... Object[] ...
+
+    // 3. KOLEKCJE i MAPY (MAJĄ REFERENCJE)
     kryo.register(ArrayList.class, new LegacyCollectionSerializer());
     kryo.register(LinkedList.class, new LegacyCollectionSerializer());
     kryo.register(HashSet.class, new LegacyCollectionSerializer());
     kryo.register(TreeSet.class, new LegacyCollectionSerializer());
-
     kryo.register(HashMap.class, new LegacyMapSerializer());
     kryo.register(TreeMap.class, new LegacyMapSerializer());
     kryo.register(ConcurrentHashMap.class, new LegacyMapSerializer());
 
-    // 5. DATY (Pola wewnętrzne muszą używać odpowiednio LegacyIntSerializer/LegacyLongSerializer)
+    // 4. DATY (MAJĄ REFERENCJE, ale można wyłączyć dla małych obiektów,
+    // jednak w V4 często miały, więc zostawmy domyślne true)
     kryo.register(LocalDate.class, new LegacyLocalDateSerializer());
     kryo.register(LocalTime.class, new LegacyLocalTimeSerializer());
     kryo.register(LocalDateTime.class, new LegacyLocalDateTimeSerializer());
@@ -94,9 +92,8 @@ public class KryoService {
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
     Input input = new Input(inputStream);
     try {
-      // WRACAMY DO STANDARDOWEGO ODCZYTU
-      // Dzięki temu Kryo obsłuży ReferenceID dla tablic/kolekcji.
-      // Dla Wrapperów/Stringów (immutable) ReferenceID nie ma, ale Kryo 5 o tym wie (z konfiguracji serializerów).
+      // Używamy readClassAndObject - to obsłuży ReferenceID dla Tablic/Kolekcji,
+      // ale pominie je dla Wrapperów/Stringów dzięki .setReferences(false)
       return kryo.readClassAndObject(input);
     } finally {
       input.close();

@@ -15,7 +15,7 @@ public class LegacyLocalDateSerializer extends Serializer<LocalDate> {
   public void write(Kryo kryo, Output output, LocalDate object) {
     output.writeShort(object.getDayOfMonth());
     output.writeShort(object.getMonthValue());
-    new LegacyIntSerializer().writeVarInt(object.getYear(), output);
+    new LegacyIntSerializer().writeVarInt(object.getYear(), true, output);
   }
 
   @Override
@@ -23,7 +23,7 @@ public class LegacyLocalDateSerializer extends Serializer<LocalDate> {
     short day = input.readShort();
     short month = input.readShort();
     // Year jako VarInt (optimizePositive=true)
-    int year = new LegacyIntSerializer().readVarInt(input);
+    int year = new LegacyIntSerializer().readVarInt(true, input);
     return LocalDate.of(year, month, day);
   }
 }

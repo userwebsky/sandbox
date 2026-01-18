@@ -13,7 +13,7 @@ public class LegacyLocalTimeSerializer extends Serializer<LocalTime> {
   public void write(Kryo kryo, Output output, LocalTime object) {
     output.writeByte(object.getHour());
     output.writeByte(object.getMinute());
-    new LegacyIntSerializer().writeVarInt(object.getNano(), output);
+    new LegacyIntSerializer().writeVarInt(object.getNano(), true, output);
     output.writeByte(object.getSecond());
   }
 
@@ -21,7 +21,7 @@ public class LegacyLocalTimeSerializer extends Serializer<LocalTime> {
   public LocalTime read(Kryo kryo, Input input, Class<? extends LocalTime> type) {
     byte hour = input.readByte();
     byte minute = input.readByte();
-    int nano = new LegacyIntSerializer().readVarInt(input);
+    int nano = new LegacyIntSerializer().readVarInt(true, input);
     byte second = input.readByte();
     return LocalTime.of(hour, minute, second, nano);
   }

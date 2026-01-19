@@ -60,9 +60,9 @@ public class KryoService {
     kryo.addDefaultSerializer(ArrayList.class, new LegacyCollectionSerializer());
     kryo.addDefaultSerializer(LinkedList.class, new LegacyCollectionSerializer());
     kryo.addDefaultSerializer(HashSet.class, new LegacyCollectionSerializer());
-    kryo.addDefaultSerializer(TreeSet.class, new LegacyCollectionSerializer());
+    kryo.addDefaultSerializer(TreeSet.class, new LegacyTreeSetSerializer());
     kryo.addDefaultSerializer(HashMap.class, new LegacyMapSerializer());
-    kryo.addDefaultSerializer(TreeMap.class, new LegacyMapSerializer());
+    kryo.addDefaultSerializer(TreeMap.class, new LegacyTreeMapSerializer());
     kryo.addDefaultSerializer(ConcurrentHashMap.class, new LegacyMapSerializer());
 
     // 4. DATY
@@ -129,11 +129,11 @@ public class KryoService {
     Kryo kryo = createKryoInstance();
     byte[] bytes = Base64.getDecoder().decode(base64Data);
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-    Input input = new Input(inputStream);
-    try {
+    try (Input input = new Input(inputStream)) {
+      // KLUCZOWE: Używamy readClassAndObject, aby obsłużyć nagłówek referencji.
+      // Dzięki poprawnym serializerom (używającym readByte) nie zgubimy pozycji.
+      // Dzięki setReferences(false) dla wrapperów, nie będziemy tam szukać RefID.
       return kryo.readClassAndObject(input);
-    } finally {
-      input.close();
     }
   }
 }

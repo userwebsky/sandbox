@@ -1,118 +1,129 @@
-# **Poradnik Migracji Kryo 4 (Java 8\) do Kryo 5 (Java 17\)**
+# **Migracja Kryo 4.x (Java 8\) do Kryo 5.x (Java 17\)**
 
-Ten dokument opisuje kroki niezbędne do przeprowadzenia migracji aplikacji korzystającej z biblioteki Kryo w wersji 4.x (na Java 8\) do wersji 5.x (na Java 17), przy zachowaniu kompatybilności wstecznej dla zserializowanych danych.
+## **Wprowadzenie**
 
-## **1\. Główne różnice i problemy**
+Ten dokument opisuje proces migracji aplikacji korzystającej z biblioteki serializacji Kryo w wersji 4.x (uruchomionej na Java 8\) do wersji 5.x (uruchomionej na Java 17). Celem jest zachowanie pełnej kompatybilności wstecznej, czyli umożliwienie odczytu danych (blobów) zapisanych przez starą wersję aplikacji w nowej wersji.
 
-Podczas migracji napotkasz trzy główne kategorie problemów:
+Migracja ta jest nietrywialna z powodu licznych zmian w formacie binarnym Kryo, zmian w domyślnej konfiguracji oraz restrykcji wprowadzonych w nowszych wersjach Javy (Project Jigsaw).
 
-1. **Zmiana domyślnych ustawień:** Kryo 5 jest "secure by default" (wymaga rejestracji klas), podczas gdy Kryo 4 było bardzo permisywne.
-2. **Zmiana formatu binarnego:**
-  * **Prymitywy i Wrappery:** Kryo 4 używało Fixed Big Endian dla Float/Double oraz VarInt (z optimizePositive=true) dla Integer/Long. Kryo 5 może używać Little Endian lub innych optymalizacji.
-  * **Tablice i Kolekcje:** Różnice w zapisie długości (nullability) oraz formacie elementów (ZigZag vs Fixed).
-  * **String:** Kryo 4 dodawało prefiks 0x01 (SOH) dla stringów ASCII w niektórych kontekstach.
-3. **Dostęp do pól (Java 17):** Domyślny FieldSerializer z Kryo 4 używa refleksji do pól prywatnych (setAccessible(true)), co w Java 17 jest blokowane przez system modułów dla klas JDK (np. java.time.\*, java.util.\*).
+## **1\. Główne Zmiany i Problemy**
 
-## **2\. Konfiguracja KryoService (Most Kompatybilności)**
+### **1.1. Zmiany w Kryo 5**
 
-Aby odczytać dane zapisane przez Kryo 4, musisz skonfigurować instancję Kryo 5 w specyficzny sposób.
+* **Bezpieczeństwo (registrationRequired):** W Kryo 4 domyślnie można było serializować każdą klasę. W Kryo 5 domyślnie wymagana jest rejestracja każdej klasy (registrationRequired \= true), co powoduje błędy IllegalArgumentException: Class is not registered przy próbie odczytu starych danych.
+* **Format Liczb (VarInt vs Fixed):**
+  * W Kryo 4 (domyślnie) typy proste w polach obiektów (int, long) były zapisywane jako **VarInt** (zmienna długość) z optymalizacją dla liczb dodatnich (optimizePositive=true).
+  * Wrappery (Integer, Long) oraz elementy tablic (int\[\], long\[\]) były zapisywane jako **VarInt z ZigZag encoding** (optimizePositive=false).
+  * Kryo 5 w wielu miejscach zmieniło te domyślne zachowania, co prowadzi do błędów KryoBufferUnderflowException lub odczytu błędnych wartości (np. 1999999998 zamiast 999999999).
+* **Format Stringów:** Kryo 4 dla stringów ASCII potrafiło dodawać prefiks 0x01 (SOH). Kryo 5 czyta to jako część stringa, co powoduje "śmieci" na początku tekstu (np. \\u0001Hello).
+* **Obsługa Referencji:** Sposób zapisu nagłówka referencji dla głównego obiektu (korzenia) różni się. W Kryo 4 korzeń często nie miał ID referencji, podczas gdy w Kryo 5 metoda readClassAndObject zawsze go oczekuje.
+* **Kolejność ID Klas:** Kryo 4 miało wbudowane domyślne rejestracje z konkretnymi ID (np. TreeSet \= 36). Kryo 5 ma inną kolejność, co powoduje, że odczyt po ID z pliku V4 prowadzi do użycia niewłaściwego serializera.
 
-### **2.1. Ustawienia globalne**
+### **1.2. Zmiany w Java 17**
+
+* **Enkapsulacja (Jigsaw):** Domyślny FieldSerializer w Kryo 4 używa refleksji (setAccessible(true)) do prywatnych pól. W Java 17 jest to zablokowane dla klas z pakietów JDK, co kończy się InaccessibleObjectException.
+
+## **2\. Rozwiązanie \- Warstwa Kompatybilności**
+
+Aby obsłużyć stary format danych, został stworzony zestaw klas i konfiguracji.
+
+### **2.1. Konfiguracja KryoService**
 
 Kryo kryo \= new Kryo();
 
-// 1\. Wyłącz wymóg rejestracji (Kryo 4 domyślnie pozwalało na niezarejestrowane klasy)  
+// 1\. Przywróć zachowanie V4: pozwól na niezarejestrowane klasy  
 kryo.setRegistrationRequired(false);
 
-// 2\. Włącz referencje (Kryo 4 domyślnie obsługiwało grafy cykliczne)  
+// 2\. Włącz referencje (domyślne w V4)  
 kryo.setReferences(true);
 
-// 3\. Użyj StdInstantiatorStrategy (do tworzenia obiektów bez konstruktora bezargumentowego)  
+// 3\. Strategia instancjonowania (dla klas bez pustego konstruktora)  
 kryo.setInstantiatorStrategy(new org.objenesis.strategy.StdInstantiatorStrategy());
 
-### **2.2. Strategia deserializacji (Manual vs readClassAndObject)**
+### **2.2. Wymuszenie ID klas**
 
-Kluczowym problemem jest obsługa nagłówka referencji (NOT\_NULL / RefID) dla obiektu głównego (korzenia).
+Musimy zarejestrować kluczowe typy pod tymi samymi ID, co w Kryo 4, aby deserializacja po ID działała poprawnie.
 
-* **Kryo 4:** Dla wielu typów (np. ArrayList niezarejestrowana) **nie zapisywało** nagłówka referencji dla korzenia.
-* **Kryo 5 (readClassAndObject):** Zawsze oczekuje nagłówka referencji, jeśli klasa ma włączone referencje.
-
-**Rozwiązanie:** Używaj kryo.readClassAndObject(input) **ALE** musisz wyłączyć referencje dla typów, które w V4 ich nie miały (wrappery, String) oraz upewnić się, że kolekcje/tablice są obsługiwane przez poprawione serializery.
-
-## **3\. Implementacja Legacy Serializerów**
-
-Musisz zaimplementować własne serializery, które emulują zachowanie Kryo 4\.
-
-### **3.1. LegacyAdapters (Klucz do sukcesu)**
-
-Stwórz klasę narzędziową z metodami do czytania/pisania w formacie V4.
-
-* **Int/Long:** Używaj VarInt (zmienna długość).
-* **Float/Double/Short/Char:** Używaj Fixed Big Endian.
-* **ZigZag:** Pamiętaj, że elementy tablic int\[\]/long\[\] w V4 były zapisywane z optimizePositive=false (ZigZag).
-
-### **3.2. Serializery dla Typów Prostych**
-
-Zarejestruj je z setReferences(false), aby readClassAndObject nie szukało dla nich ID w strumieniu.
-
-// W KryoService  
-kryo.register(Integer.class, new LegacyIntSerializer()).setReferences(false);  
-kryo.register(Long.class, new LegacyLongSerializer()).setReferences(false);  
-kryo.register(Float.class, new LegacyAdapters.LegacyFloatSerializer()).setReferences(false);  
-// ... i tak dalej dla Double, Boolean, Byte, Char, Short, String
-
-### **3.3. Serializery dla Tablic**
-
-Standardowe serializery tablic w V5 nie pasują do formatu V4 (długość \+ 1, ZigZag elementów).  
-Napisz LegacyIntArraySerializer, LegacyStringArraySerializer itd., które używają LegacyAdapters.readVarIntLegacy.  
-Ważne: Używaj input.readByte() w pętlach, aby poprawnie aktualizować pozycję bufora\!
-
-### **3.4. Serializery dla Kolekcji i Map**
-
-Standardowe serializery V5 mogą rzucać ArrayIndexOutOfBounds przy czytaniu rozmiaru zapisanego jako VarInt.  
-Użyj LegacyCollectionSerializer i LegacyMapSerializer, które czytają rozmiar przez LegacyAdapters.
-
-### **3.5. Serializery dla Dat (Java 8 Time)**
-
-Kryo 4 używało FieldSerializer do LocalDate, Instant itd.  
-W Java 17 FieldSerializer rzuci InaccessibleObjectException przy próbie dostępu do prywatnych pól (np. year).  
-Rozwiązanie: Napisz serializery (np. LegacyLocalDateSerializer), które czytają bajty w kolejności alfabetycznej pól (jak robił to FieldSerializer), ale tworzą obiekt przez publiczne API (np. LocalDate.of()).  
-**Format pól w V4:**
-
-* int \-\> VarInt (optimizePositive=true).
-* long \-\> VarLong (optimizePositive=false \- ZigZag\!).
-* short/byte \-\> Fixed.
-
-## **4\. Rejestracja Klas i ID (Krytyczne dla TreeSet/TreeMap)**
-
-Kryo 4 miało wbudowane domyślne rejestracje z konkretnymi ID, np.:
-
-* int\[\] \-\> ID 10
-* String\[\] \-\> ID 11
-* TreeSet \-\> ID 36
-* TreeMap \-\> ID 38
-
-Kryo 5 ma inną kolejność. Jeśli nie wymusisz tych ID, Kryo 5 spróbuje odczytać dane TreeSet (ID 36\) używając serializera przypisanego do ID 36 w V5 (którym może być cokolwiek), co skończy się błędem lub pustą kolekcją.
-
-**Wymagana konfiguracja w KryoService:**
-
-// Wymuś ID zgodne z Kryo 4  
+// Tablice  
 kryo.register(int\[\].class, new LegacyIntArraySerializer(), 10);  
 kryo.register(String\[\].class, new LegacyStringArraySerializer(), 11);  
-// ...  
-kryo.register(TreeSet.class, new LegacyCollectionSerializer(), 36);  
-kryo.register(TreeMap.class, new LegacyMapSerializer(), 38);
+// ...
 
-## **5\. Podsumowanie listy kontrolnej**
+// Kolekcje specjalne  
+kryo.register(TreeSet.class, new LegacyTreeSetSerializer(), 36);  
+kryo.register(TreeMap.class, new LegacyTreeMapSerializer(), 38);
 
-1. \[ \] Ustaw registrationRequired \= false i references \= true.
-2. \[ \] Zaimplementuj LegacyAdapters (VarInt, BigEndian).
-3. \[ \] Zaimplementuj LegacyIntSerializer / LegacyLongSerializer (obsługa ZigZag).
-4. \[ \] Zaimplementuj LegacyStringSerializer (obsługa SOH 0x01).
-5. \[ \] Zaimplementuj serializery dla tablic (LegacyIntArraySerializer...).
-6. \[ \] Zaimplementuj serializery dla dat (LegacyLocalDateSerializer...) omijające refleksję.
-7. \[ \] W KryoService: Zarejestruj wrappery i String z setReferences(false).
-8. \[ \] W KryoService: Zarejestruj kolekcje/mapy/tablice z odpowiednimi ID z Kryo 4\.
-9. \[ \] Używaj kryo.readClassAndObject(input) do deserializacji.
+### **2.3. Wyłączenie referencji dla typów prostych**
 
-Powodzenia w migracji\!
+W Kryo 4 wrappery i Stringi (jako obiekty niemutowalne) nie były zapisywane z nagłówkiem referencji. Musimy o tym poinformować Kryo 5\.
+
+kryo.register(Integer.class, new LegacyIntSerializer()).setReferences(false);  
+kryo.register(String.class, new LegacyStringSerializer()).setReferences(false);  
+// ... i tak dalej dla wszystkich wrapperów
+
+### **2.4. Strategia Deserializacji**
+
+Używamy metody kryo.readClassAndObject(input), która potrafi obsłużyć nagłówek referencji (jeśli występuje) oraz jego brak (dla typów z setReferences(false)).
+
+## **3\. Implementacja Serializerów (Kod)**
+
+Stworzyliśmy zestaw klas ...Serializer w pakiecie serializers.
+
+### **3.1. KryOldAdapters**
+
+Klasa narzędziowa zawierająca logikę czytania/pisania w starym formacie.
+
+* **VarInt Legacy:** Obsługuje zmienną długość (1-5 bajtów) z opcjonalnym kodowaniem ZigZag. Kluczowe jest użycie input.readByte(), aby poprawnie przesuwać kursor w strumieniu.
+* **Big Endian Fixed:** Obsługuje zapis stałobajtowy (4 bajty dla int/float, 8 dla long/double) w kolejności Big Endian (Kryo 5 często używa Little Endian).
+
+### **3.2. Przykłady Serializerów**
+
+* **IntSerializer:** Dla wrapperów Integer. Wymusza ZigZag (optimizePositive=false).
+* **IntArraySerializer:** Czyta długość jako VarInt(true), a elementy jako ZigZag (VarInt(false)).
+* **StringSerializer:** Wykrywa i pomija bajt 0x01 (SOH) na początku stringa.
+* **TreeSetSerializer / TreeMapSerializer:** Kluczowa różnica względem standardowych kolekcji – te serializery w V4 najpierw zapisywały **Comparator**, a dopiero potem dane. Nasze serializery muszą go najpierw odczytać.
+* **LocalDateSerializer (i inne daty):** Zamiast używać FieldSerializer (refleksja na java.time w Java 17 \= błąd), czytamy bajty ręcznie (zgodnie z układem pól w klasie) i tworzymy obiekt przez LocalDate.of(). Używamy helperów z Adapters.
+
+## **4\. Słowniczek Pojęć i Wprowadzenie do Operacji Bitowych**
+
+### **Pojęcia**
+
+* **Serializacja:** Proces zamiany obiektu w pamięci na ciąg bajtów (aby zapisać go w pliku lub wysłać przez sieć).
+* **Deserializacja:** Proces odwrotny – odtworzenie obiektu z bajtów.
+* **VarInt (Variable Length Integer):** Sposób zapisu liczby całkowitej używający od 1 do 5 bajtów. Mniejsze liczby zajmują mniej miejsca. Najstarszy bit każdego bajtu mówi, czy to już koniec liczby.
+* **ZigZag Encoding:** Sposób kodowania liczb ujemnych w VarInt. Liczby ujemne (np. \-1) w standardowym kodowaniu są bardzo duże (dużo jedynek w U2), więc zajmowałyby 5 bajtów. ZigZag mapuje: 0-\>0, \-1-\>1, 1-\>2, \-2-\>3 itd., dzięki czemu małe liczby ujemne też zajmują mało miejsca.
+* **Endianness (Big Endian vs Little Endian):** Kolejność bajtów w liczbie wielobajtowej.
+  * **Big Endian (BE):** "Najważniejszy" bajt (najstarszy) jest pierwszy. Jak w normalnym zapisie liczby (tysiące, setki, dziesiątki...). To format sieciowy i domyślny w Javie (DataOutputStream).
+  * **Little Endian (LE):** "Najmniej ważny" bajt jest pierwszy. Format natywny procesorów x86. Kryo 5 często go używa dla wydajności.
+
+### **Operacje Bitowe w Java**
+
+W naszych serializerach (np. LegacyAdapters) używamy operatorów bitowych do "składania" bajtów w liczby.
+
+* & 0xFF (AND): W Javie byte jest ze znakiem (-128 do 127). Jeśli mamy bajt 11111111, Java widzi to jako \-1. Operacja & 0xFF (czyli & 00000000 00000000 00000000 11111111\) zamienia to na int o wartości 255 (bez znaku).
+  * Przykład: input.readByte() & 0xFF pozwala traktować bajt jako liczbę 0-255.
+* \<\< (Przesunięcie w lewo): Mnoży liczbę przez 2^n. Służy do przesuwania bajtu na właściwą pozycję.
+  * Przykład przy czytaniu int (Big Endian):
+    1. Czytamy 1\. bajt. Przesuwamy go o 24 bity w lewo (\<\< 24).
+    2. Czytamy 2\. bajt. Przesuwamy o 16 bitów.
+    3. Czytamy 3\. bajt. Przesuwamy o 8 bitów.
+    4. Czytamy 4\. bajt. Nie przesuwamy.
+* | (OR): Sumuje bity. Używamy go do sklejenia przesuniętych bajtów w jedną całość.
+  * wynik \= (b1 \<\< 24\) | (b2 \<\< 16\) | ...
+* \>\>\> (Przesunięcie w prawo bez znaku): Służy do "wyciągnięcia" bajtów z liczby przy zapisie. value \>\>\> 24 przesuwa bity w prawo, tak że najstarsze 8 bitów ląduje na pozycji najmłodszych (gotowe do zapisu jako byte).
+
+## **5\. Podsumowanie Wymaganych Plików**
+
+Do poprawnego działania w projekcie muszą znaleźć się:
+
+1. **LegacyAdapters.java** \- Narzędzia IO.
+2. **LegacyIntSerializer.java** \- Obsługa Integer i VarInt.
+3. **LegacyLongSerializer.java** \- Obsługa Long i VarLong.
+4. **LegacyStringSerializer.java** \- Obsługa String (SOH).
+5. **LegacyIntArraySerializer.java** (i inne tablice) \- Obsługa tablic.
+6. **LegacyCollectionSerializer.java** \- Obsługa standardowych kolekcji.
+7. **LegacyMapSerializer.java** \- Obsługa standardowych map.
+8. **LegacyTreeSetSerializer.java** \- Specjalna obsługa TreeSet (komparator).
+9. **LegacyTreeMapSerializer.java** \- Specjalna obsługa TreeMap (komparator).
+10. **LegacyLocalDateSerializer.java** (i inne daty) \- Obsługa Java Time API.
+11. **KryoService.java** \- Spinająca to wszystko konfiguracja z rejestracją ID i metodą deserialize używającą readClassAndObject.
